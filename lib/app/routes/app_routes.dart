@@ -20,6 +20,7 @@ abstract class Routes {
   static const EDIT_PROFIL = _Paths.EDIT_PROFIL;
   static const NOTIFIKASI = _Paths.NOTIFIKASI;
   static const PEMBAYARAN_PESANAN = _Paths.PEMBAYARAN_PESANAN;
+  static const PENGENALAN = _Paths.PENGENALAN;
 }
 
 abstract class _Paths {
@@ -41,4 +42,5 @@ abstract class _Paths {
   static const EDIT_PROFIL = '/edit-profil';
   static const NOTIFIKASI = '/notifikasi';
   static const PEMBAYARAN_PESANAN = '/pembayaran-pesanan';
+  static const PENGENALAN = '/pengenalan';
 }

@@ -207,7 +207,7 @@ class RegisterRoleView extends GetView<RegisterRoleController> {
                           subtitle: "Apakah Anda yakin?",
                           onConfirm: () {
                             Get.offAll(() => MainPageView());
-                            controller.daftar();
+                            controller.daftar(AllMaterial.isServant.isTrue ? "servant" : "vendee");
                             AllMaterial.box.write("login", true);
                           },
                           onCancel: () => Get.back(),

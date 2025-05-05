@@ -6,10 +6,11 @@ class PengaturanController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final isDark = AllMaterial.box.read('isDarkMode') ?? false;
-    AllMaterial.isDarkMode.value = isDark;
 
-    Future.microtask(() {
+    // final isDark = AllMaterial.box.read('isDarkMode') ?? false;
+    var isDark = AllMaterial.isDarkMode.isTrue;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.changeThemeMode(isDark ? ThemeMode.dark : ThemeMode.light);
     });
   }

@@ -1,8 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jaspelku/all_material.dart';
 import 'package:jaspelku/app/modules/login/views/login_view.dart';
 
 class GeneralController extends GetxController {
+  static String shortenWithSeeMore(String text,
+      {required int maxLines, required BuildContext context}) {
+    final span = TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style,
+    );
+    final tp = TextPainter(
+      text: span,
+      maxLines: maxLines,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: MediaQuery.of(context).size.width);
+    if (tp.didExceedMaxLines) {
+      return "${text.substring(0, 80)}... Lihat Selengkapnya";
+    } else {
+      return text;
+    }
+  }
+
   Future<dynamic> logout({bool isExpired = false}) async {
     Get.offAll(() => const LoginView());
     AllMaterial.isServant.value = false;

@@ -23,18 +23,16 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
     controller.waktuSelesaiC.text = controller.waktuSelesaiC.text.isNotEmpty
         ? controller.waktuSelesaiC.text
         : AllMaterial.formatTime24(defaultEnd);
-    final hargaMin = int.tryParse(controller.hargaMinC.text) ?? 0;
-    final hargaMax = int.tryParse(controller.hargaMaxC.text) ?? 0;
+    final harga = int.tryParse(controller.totalHargaC.text) ?? 0;
 
     return Scaffold(
       appBar: AppBar(
         actions: [
           TextButton(
             onPressed: () {
-              if (hargaMin >= hargaMax) {
+              if (harga == 0) {
                 AllMaterial.messageScaffold(
-                  title:
-                      "Harga minimal tidak boleh sama, atau harus lebih besar dari harga maksimal",
+                  title: "Tawaran Harga tidak boleh kosong",
                 );
               } else {
                 if (isTawaranBaru) {
@@ -95,7 +93,7 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                                     Icons.arrow_right,
                                   ),
                                   Text(
-                                    "Nama Servant",
+                                    "Nama Servantt",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -113,75 +111,58 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                           spacing: 3,
                           runSpacing: 5,
                           children: [
-                            // PILIH KATEGORI
-                            Obx(() => TopicWidget(
-                                  label:
-                                      controller.selectedKategori.value.isEmpty
-                                          ? "Kategori"
-                                          : controller.selectedKategori.value,
-                                  onTap: () => showTopicOptions(
-                                    context: context,
-                                    title: "Pilih Kategori Jasa",
-                                    options: [
-                                      'Jasa Kebersihan',
-                                      'Jasa Teknisi',
-                                      'Jasa Kreatif',
-                                      'Jasa Transportasi',
-                                    ],
-                                    selected: controller.selectedKategori,
-                                  ),
-                                )),
-
-                            // PILIH JENIS JASA BERDASARKAN KATEGORI
-                            Obx(
-                              () {
-                                final jenisList =
-                                    controller.getJenisJasaByKategori(
-                                        controller.selectedKategori.value);
-                                return TopicWidget(
-                                  label: controller.selectedJenis.value.isEmpty
-                                      ? "Jenis Jasa"
-                                      : controller.selectedJenis.value,
-                                  onTap: jenisList.isEmpty
-                                      ? () => AllMaterial.messageScaffold(
-                                            title:
-                                                "Pilih kategori terlebih dahulu",
-                                          )
-                                      : () => showTopicOptions(
-                                            context: context,
-                                            title: "Pilih Jenis Jasa",
-                                            options: jenisList,
-                                            selected: controller.selectedJenis,
-                                          ),
-                                );
-                              },
+                            // Kategori
+                            _buildTopic(
+                              labelRx: controller.selectedKategori,
+                              defaultLabel: "Kategori",
+                              context: context,
+                              title: "Pilih Kategori Jasa",
+                              options: AllMaterial.jenisJasaMap.keys.toList(),
+                              selected: controller.selectedKategori,
+                              controller: controller,
+                              isKategori: true,
                             ),
 
-                            // PILIH LOKASI
-                            Obx(
-                              () => TopicWidget(
-                                label: controller.selectedLokasi.value.isEmpty
-                                    ? "Lokasi Kerja"
-                                    : controller.selectedLokasi.value,
-                                onTap: () => showTopicOptions(
-                                  context: context,
-                                  title: "Pilih Lokasi",
-                                  options: AllMaterial.isServant.isFalse
-                                      ? [
-                                          "Lokasi Saat Ini",
-                                          "Tentukan Lokasi Saya"
-                                        ]
-                                      : [
-                                          "Lokasi Saat Ini",
-                                          "Sekitar Saya (Radius 5 km)",
-                                          'Dalam Kota',
-                                          'Luar Kota / Antar Provinsi',
-                                          'Online / Remote Service',
-                                          'Mana Saja'
-                                        ],
-                                  selected: controller.selectedLokasi,
-                                ),
-                              ),
+                            // Jenis Jasa
+                            Obx(() {
+                              final jenisList =
+                                  controller.getJenisJasaByKategori(
+                                      controller.selectedKategori.value);
+                              return _buildTopic(
+                                labelRx: controller.selectedJenis,
+                                defaultLabel: "Jenis Jasa",
+                                context: context,
+                                title: "Pilih Jenis Jasa",
+                                options: jenisList,
+                                selected: controller.selectedJenis,
+                                controller: controller,
+                                isKategori: false,
+                                onEmpty: () => AllMaterial.messageScaffold(
+                                    title: "Pilih kategori terlebih dahulu"),
+                                enabled: jenisList.isNotEmpty,
+                              );
+                            }),
+
+                            // Lokasi
+                            _buildTopic(
+                              labelRx: controller.selectedLokasi,
+                              defaultLabel: "Lokasi Kerja",
+                              context: context,
+                              title: "Pilih Lokasi Kerja",
+                              options: AllMaterial.isServant.isFalse
+                                  ? ["Lokasi Saat Ini", "Tentukan Lokasi Saya"]
+                                  : [
+                                      "Lokasi Saat Ini",
+                                      "Sekitar Saya (Radius 5 km)",
+                                      'Dalam Kota',
+                                      'Luar Kota / Antar Provinsi',
+                                      'Online / Remote Service',
+                                      'Mana Saja'
+                                    ],
+                              selected: controller.selectedLokasi,
+                              controller: controller,
+                              isKategori: false,
+                              isSearch: true,
                             ),
                           ],
                         )
@@ -203,7 +184,8 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                         ? Color(0xFF121212)
                         : null,
                     hintStyle: TextStyle(fontWeight: AllMaterial.fontRegular),
-                    hintText: "Bagikan kebutuhan Anda...",
+                    hintText:
+                        "Deskripsikan ${AllMaterial.isServant.isFalse ? "kebutuhan" : "jasa"} Anda...",
                     border: InputBorder.none,
                   ),
                 ),
@@ -373,30 +355,13 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                 children: [
                   Expanded(
                     child: AllMaterial.textField(
-                      controller: controller.hargaMinC,
+                      controller: controller.totalHargaC,
                       color: AllMaterial.isDarkMode.isFalse
                           ? AllMaterial.colorPrimary
                           : null,
-                      labelText: "Harga Minimal",
+                      labelText: "Harga",
                       prefixText: "Rp ",
                       textInputAction: TextInputAction.next,
-                      textInputType: TextInputType.number,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    "━",
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: AllMaterial.textField(
-                      controller: controller.hargaMaxC,
-                      labelText: "Harga Maksimal",
-                      color: AllMaterial.isDarkMode.isFalse
-                          ? AllMaterial.colorPrimary
-                          : null,
-                      prefixText: "Rp ",
-                      textInputAction: TextInputAction.done,
                       textInputType: TextInputType.number,
                     ),
                   ),
@@ -477,29 +442,31 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
 
               const Text("Hari Kerja", style: TextStyle(fontSize: 16)),
               const SizedBox(height: 15),
-              Obx(() => DropdownButtonFormField<String>(
-                    borderRadius: BorderRadius.circular(5),
-                    dropdownColor: AllMaterial.isDarkMode.isTrue
+              Obx(
+                () => DropdownButtonFormField<String>(
+                  borderRadius: BorderRadius.circular(5),
+                  dropdownColor: AllMaterial.isDarkMode.isTrue
+                      ? Color(0xFF121212)
+                      : AllMaterial.colorWhite,
+                  decoration: InputDecoration(
+                    fillColor: AllMaterial.isDarkMode.isTrue
                         ? Color(0xFF121212)
                         : AllMaterial.colorWhite,
-                    decoration: InputDecoration(
-                      fillColor: AllMaterial.isDarkMode.isTrue
-                          ? Color(0xFF121212)
-                          : AllMaterial.colorWhite,
-                      hintText: "Pilih Jenis Hari",
-                      border: OutlineInputBorder(),
-                    ),
-                    value: controller.selectedOpsi.value,
-                    items: ['Sekali / Sehari', 'Kustom']
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (val) {
-                      controller.selectedOpsi.value = val!;
-                      if (val == 'Sekali / Sehari') {
-                        controller.selectedHari.clear();
-                      }
-                    },
-                  )),
+                    hintText: "Pilih Jenis Hari",
+                    border: OutlineInputBorder(),
+                  ),
+                  value: controller.selectedOpsi.value,
+                  items: ['Sekali / Sehari', 'Kustom']
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+                  onChanged: (val) {
+                    controller.selectedOpsi.value = val!;
+                    if (val == 'Sekali / Sehari') {
+                      controller.selectedHari.clear();
+                    }
+                  },
+                ),
+              ),
               const SizedBox(height: 12),
               Obx(() {
                 if (controller.selectedOpsi.value == 'Kustom') {
@@ -535,10 +502,9 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
           child: AllMaterial.cusButton(
             label: "Ajukan Tawaran",
             onTap: () {
-              if (hargaMin >= hargaMax) {
+              if (harga == 0) {
                 AllMaterial.messageScaffold(
-                  title:
-                      "Harga minimal tidak boleh sama, atau harus lebih besar dari harga maksimal",
+                  title: "Tawaran Harga tidak boleh kosong",
                 );
               } else {
                 if (isTawaranBaru) {
@@ -558,36 +524,141 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
   }
 }
 
+Widget _buildTopic({
+  required RxString labelRx,
+  required String defaultLabel,
+  required BuildContext context,
+  required String title,
+  required List<String> options,
+  required RxString selected,
+  required PostinganBaruController controller,
+  required bool isKategori,
+  bool isSearch = false,
+  bool enabled = true,
+  VoidCallback? onEmpty,
+}) {
+  print(options);
+  return Obx(() => TopicWidget(
+        label: labelRx.value.isEmpty ? defaultLabel : labelRx.value,
+        onTap: enabled
+            ? () => showTopicOptions(
+                  context: context,
+                  title: title,
+                  options: options,
+                  selected: selected,
+                  controller: controller,
+                  isKategori: isKategori,
+                  isSearch: isSearch,
+                )
+            : (onEmpty ?? () {}),
+      ));
+}
+
 void showTopicOptions({
   required BuildContext context,
   required String title,
   required List<String> options,
   required RxString selected,
+  bool isSearch = false,
+  required PostinganBaruController controller,
+  required bool isKategori,
 }) {
-  Get.bottomSheet(
-    Material(
+  TextEditingController searchController = TextEditingController();
+  List<String> originalOptions = options;
+
+  RxList<String> filteredOptions = RxList<String>(originalOptions);
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => Material(
       color: AllMaterial.isDarkMode.isFalse ? Colors.white : Colors.black,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Wrap(
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.only(
+                  bottom: 16, left: 20, right: 20, top: 16),
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                width: Get.height / 4.5,
+                height: 4,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.grey,
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            ...options.map((item) => ListTile(
-                  title: Text(item),
-                  onTap: () {
-                    selected.value = item;
-                    Get.back();
-                  },
-                )),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: const Icon(Icons.clear),
+                  ),
+                ],
+              ),
+            ),
+
+            (isSearch)
+                ? SizedBox.shrink()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: searchController,
+                      style: TextStyle(fontWeight: AllMaterial.fontRegular),
+                      decoration: InputDecoration(
+                        hintText: 'Cari...',
+                        hintStyle:
+                            TextStyle(fontWeight: AllMaterial.fontRegular),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                      ),
+                      onChanged: (query) {
+                        filteredOptions.value = originalOptions
+                            .where((item) => item
+                                .toLowerCase()
+                                .contains(query.toLowerCase()))
+                            .toList();
+                      },
+                    ),
+                  ),
+
+            isSearch ? SizedBox.shrink() : const SizedBox(height: 10),
+
+            // List pilihan
+            Flexible(
+              child: Obx(
+                () => SingleChildScrollView(
+                  child: Column(
+                    children: filteredOptions
+                        .map((item) => ListTile(
+                              title: Text(item),
+                              onTap: () {
+                                selected.value = item;
+                                Get.back();
+                              },
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

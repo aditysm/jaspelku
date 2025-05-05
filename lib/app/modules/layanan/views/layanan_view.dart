@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/controller/general_controller.dart';
 import 'package:jaspelku/app/widget/random_topic_container.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
@@ -28,7 +29,7 @@ class LayananView extends GetView<LayananController> {
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 Expanded(
                   child: filtered.isNotEmpty
                       ? ListView.builder(
@@ -73,7 +74,7 @@ class LayananView extends GetView<LayananController> {
                       color: AllMaterial.colorPrimaryShade, size: 18),
                   SizedBox(width: 6),
                   Text(
-                    "Postingan Anda",
+                    "Tawaran Anda",
                     style: TextStyle(
                       color: AllMaterial.colorPrimaryShade,
                       fontWeight: FontWeight.bold,
@@ -86,13 +87,8 @@ class LayananView extends GetView<LayananController> {
           // User info
           Row(
             children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: AllMaterial.colorPrimary,
-                child: Text(
-                  data['nama'][0],
-                  style: TextStyle(color: AllMaterial.colorWhite),
-                ),
+              AllMaterial.avatarWidget(
+                name: data['nama'][0],
               ),
               SizedBox(width: 12),
               Column(
@@ -110,7 +106,25 @@ class LayananView extends GetView<LayananController> {
               ),
               Spacer(),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  AllMaterial.bottomSheetMore(
+                    2,
+                    [
+                      (AllMaterial.isServant.isTrue
+                          ? "Ambil Tawaran"
+                          : "Tawar Servant"),
+                      isPostinganSaya ? "Hapus Tawaran" : "Hapus untuk Saya",
+                    ],
+                    [
+                      () => Get.back(),
+                      () => Get.back(),
+                    ],
+                    [
+                      Icon(Icons.swap_horizontal_circle_outlined),
+                      Icon(Icons.delete_outline),
+                    ],
+                  );
+                },
                 icon: Icon(Icons.more_horiz),
               ),
             ],
@@ -126,12 +140,14 @@ class LayananView extends GetView<LayananController> {
                 label: data['judul'],
                 icon: Icons.home_repair_service,
               ),
-              ...data['tags'].map<Widget>((tag) {
-                return RandomTopicContainer(
-                  label: tag,
-                  icon: Icons.label_outline,
-                );
-              }).toList(),
+              RandomTopicContainer(
+                label: data['jenis'],
+                icon: Icons.category_rounded,
+              ),
+              RandomTopicContainer(
+                label: data['lokasi'],
+                icon: Icons.location_on,
+              ),
             ],
           ),
           SizedBox(height: 12),
@@ -143,7 +159,7 @@ class LayananView extends GetView<LayananController> {
               child: Text(
                 showFullDescription.value
                     ? deskripsi
-                    : shortenWithSeeMore(deskripsi,
+                    : GeneralController.shortenWithSeeMore(deskripsi,
                         maxLines: 3, context: context),
                 style: TextStyle(fontSize: 14),
               ),
@@ -161,7 +177,7 @@ class LayananView extends GetView<LayananController> {
                       GridView.builder(
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: 3, // Tampilkan 3 media saja
+                        itemCount: 3,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           crossAxisSpacing: 6,
@@ -175,7 +191,6 @@ class LayananView extends GetView<LayananController> {
                             borderRadius: BorderRadius.circular(8),
                             child: GestureDetector(
                               onTap: () {
-                                // Tampilkan tampilan full screen
                                 _showFullScreenMedia(context, media, index,
                                     deskripsi, data["nama"]);
                               },
@@ -252,18 +267,31 @@ class LayananView extends GetView<LayananController> {
                 color: AllMaterial.colorPrimary,
                 borderRadius: BorderRadius.circular(8),
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    AllMaterial.messageScaffold(
+                      title: isPostinganSaya
+                          ? "Membuka tawaran dan user dapat mengedit tawaran"
+                          : "Mengarahkan ke chat dan membuat tawaran",
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.all(8),
                     width: Get.width,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.swap_horizontal_circle_outlined,
+                        Icon(
+                            isPostinganSaya
+                                ? Icons.edit
+                                : Icons.swap_horizontal_circle_outlined,
                             color: AllMaterial.colorWhite),
                         SizedBox(width: 8),
                         Text(
-                          "Tawar Servant",
+                          isPostinganSaya
+                              ? "Edit Tawaran"
+                              : AllMaterial.isServant.value
+                                  ? "Ambil Tawaran"
+                                  : "Tawar Servant",
                           style: TextStyle(
                             color: AllMaterial.colorWhite,
                             fontWeight: AllMaterial.fontSemiBold,
@@ -311,54 +339,6 @@ class LayananView extends GetView<LayananController> {
         ],
       ),
     );
-  }
-
-  // Widget untuk menampilkan gambar atau video
-  Widget _buildMedia(
-    String mediaItem,
-    ValueNotifier<bool> hideUI,
-    TransformationController transformationController,
-  ) {
-    final isVideo = mediaItem.endsWith('.mp4') || mediaItem.endsWith('.mov');
-
-    if (isVideo) {
-      return _buildVideoPlayer(mediaItem);
-    }
-
-    return InteractiveViewer(
-      transformationController: transformationController,
-      panEnabled: true,
-      scaleEnabled: true,
-      minScale: 1.0,
-      maxScale: 4.0,
-      child: Center(
-        child: Image.asset(
-          mediaItem,
-          fit: BoxFit.contain,
-          width: double.infinity,
-          height: double.infinity,
-        ),
-      ),
-    );
-  }
-
-  // Utility shorten text
-  String shortenWithSeeMore(String text,
-      {required int maxLines, required BuildContext context}) {
-    final span = TextSpan(
-      text: text,
-      style: DefaultTextStyle.of(context).style,
-    );
-    final tp = TextPainter(
-      text: span,
-      maxLines: maxLines,
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: MediaQuery.of(context).size.width);
-    if (tp.didExceedMaxLines) {
-      return "${text.substring(0, 80)}... Lihat Selengkapnya";
-    } else {
-      return text;
-    }
   }
 
   // Widget untuk menampilkan video
@@ -517,7 +497,7 @@ class LayananView extends GetView<LayananController> {
                         },
                         itemBuilder: (context, index) {
                           final mediaItem = media[index];
-                          return _buildMedia(
+                          return AllMaterial.buildMedia(
                               mediaItem, hideUI, transformationController);
                         },
                       ),
@@ -599,8 +579,11 @@ class LayananView extends GetView<LayananController> {
                                             context.mediaQueryPadding.bottom +
                                                 20),
                                     child: Text(
-                                      shortenWithSeeMore(deskripsi,
-                                          maxLines: 3, context: context),
+                                      GeneralController.shortenWithSeeMore(
+                                        deskripsi,
+                                        maxLines: 3,
+                                        context: context,
+                                      ),
                                       style: TextStyle(
                                           color: AllMaterial.colorWhite),
                                     ),
@@ -654,25 +637,6 @@ class LayananView extends GetView<LayananController> {
         );
       },
     );
-  }
-}
-
-// Utility shorten text
-String shortenWithSeeMore(String text,
-    {required int maxLines, required BuildContext context}) {
-  final span = TextSpan(
-    text: text,
-    style: DefaultTextStyle.of(context).style,
-  );
-  final tp = TextPainter(
-    text: span,
-    maxLines: maxLines,
-    textDirection: TextDirection.ltr,
-  )..layout(maxWidth: MediaQuery.of(context).size.width);
-  if (tp.didExceedMaxLines) {
-    return "${text.substring(0, 80)}... Lihat Selengkapnya";
-  } else {
-    return text;
   }
 }
 

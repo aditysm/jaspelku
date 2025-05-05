@@ -12,6 +12,7 @@ class PesanView extends GetView<PesanController> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(PesanController());
+
     return Scaffold(
       body: SafeArea(
         child: Obx(() {
@@ -31,7 +32,8 @@ class PesanView extends GetView<PesanController> {
                 onTap: () {
                   Get.to(() => ChatRoomView(), arguments: {
                     "nama": chat.senderName,
-                    "isVerified": chat.isVerified
+                    "isVerified": chat.isVerified,
+                    "id": index + 1,
                   });
                 },
                 trailing: Column(
@@ -89,7 +91,9 @@ class PesanView extends GetView<PesanController> {
           color: AllMaterial.colorWhite,
           Icons.headset_mic_sharp,
         ),
-        onPressed: () {},
+        onPressed: () {
+          AllMaterial.messageScaffold(title: "Menampilkan chat admin");
+        },
       ),
     );
   }

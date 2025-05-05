@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:jaspelku/all_material.dart';
 import 'package:jaspelku/app/modules/login/views/login_view.dart';
 import 'package:jaspelku/app/modules/main_page/views/main_page_view.dart';
+import 'package:jaspelku/app/modules/pengenalan/views/pengenalan_view.dart';
 import 'package:jaspelku/app/widget/splash_screen.dart';
 
 import 'app/routes/app_pages.dart';
@@ -40,6 +41,13 @@ void main() async {
           background: Color(0xFF121212),
           onPrimary: Colors.white,
         ),
+        chipTheme: ThemeData.dark().chipTheme.copyWith(
+              selectedColor: AllMaterial.colorPrimary,
+              backgroundColor: Colors.transparent,
+              disabledColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+            ),
         dialogBackgroundColor: const Color(0xFF121212),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF121212),
@@ -78,10 +86,21 @@ void main() async {
               // controller.loadHistory();
             });
             bool isLogged = AllMaterial.box.read("login") ?? false;
+
             if (isLogged) {
+              var role =
+                  AllMaterial.box.read("role") == "servant" ? true : false;
+              AllMaterial.isServant.value = role;
+
               return MainPageView();
             }
-            return const LoginView();
+            bool sudahPengenalan =
+                AllMaterial.box.read("sudahPengenalan") ?? false;
+            if (!sudahPengenalan) {
+              return PengenalanView();
+            } else {
+              return const LoginView();
+            }
           }
         },
       ),

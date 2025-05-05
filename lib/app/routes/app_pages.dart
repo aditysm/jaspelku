@@ -20,6 +20,8 @@ import '../modules/pencarian/bindings/pencarian_binding.dart';
 import '../modules/pencarian/views/pencarian_view.dart';
 import '../modules/pengaturan/bindings/pengaturan_binding.dart';
 import '../modules/pengaturan/views/pengaturan_view.dart';
+import '../modules/pengenalan/bindings/pengenalan_binding.dart';
+import '../modules/pengenalan/views/pengenalan_view.dart';
 import '../modules/pesan/bindings/pesan_binding.dart';
 import '../modules/pesan/views/pesan_view.dart';
 import '../modules/postingan_baru/bindings/postingan_baru_binding.dart';
@@ -87,7 +89,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PENGATURAN,
-      page: () => const PengaturanView(),
+      page: () => PengaturanView(),
       binding: PengaturanBinding(),
     ),
     GetPage(
@@ -114,6 +116,11 @@ class AppPages {
       name: _Paths.NOTIFIKASI,
       page: () => const NotifikasiView(),
       binding: NotifikasiBinding(),
+    ),
+    GetPage(
+      name: _Paths.PENGENALAN,
+      page: () => const PengenalanView(),
+      binding: PengenalanBinding(),
     ),
   ];
 }

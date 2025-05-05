@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:jaspelku/all_material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 enum MetodePembayaran { jaspelCoin, midtrans }
@@ -16,13 +17,15 @@ class HistoriPesananController extends GetxController {
 
   void bayarSekarang() {
     if (selectedMethod.value == MetodePembayaran.jaspelCoin) {
-      Get.snackbar("Pembayaran", "Diproses dengan Jaspel Coin");
+      AllMaterial.messageScaffold(title: "Diproses dengan Jaspel Coin");
     } else if (selectedMethod.value == MetodePembayaran.midtrans) {
       final paymentUrl =
           "https://app.sandbox.midtrans.com/snap/v2/vtweb/12345678-aaaa-bbbb-cccc-123456789abc";
       showMidtransWebView(paymentUrl);
     } else {
-      Get.snackbar("Gagal", "Silakan pilih metode pembayaran terlebih dahulu");
+      AllMaterial.messageScaffold(
+        title: "Silakan pilih metode pembayaran terlebih dahulu",
+      );
     }
   }
 
@@ -58,7 +61,7 @@ class HistoriPesananController extends GetxController {
     );
   }
 
-  final dataRating = {
+  final dataRating = [ {
     'id': '2',
     'nama': 'Budi',
     'waktu': DateTime.now().subtract(Duration(minutes: 10)),
@@ -78,5 +81,5 @@ class HistoriPesananController extends GetxController {
     'media': [
       "assets/logo/spesialis.jpg",
     ]
-  }.obs;
+  }].obs;
 }

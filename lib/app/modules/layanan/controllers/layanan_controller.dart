@@ -12,11 +12,12 @@ class LayananController extends GetxController {
     'id': '1',
     'nama': 'Kamu',
     'waktu': DateTime.now().subtract(Duration(minutes: 2)),
-    'judul': 'Servis AC Panggilan Cepat',
     'deskripsi':
         "Layanan angkut barang profesional menawarkan solusi efisien dan aman untuk memenuhi kebutuhan transportasi barang dalam berbagai skala. Dengan tim yang terlatih dan pengalaman di bidang logistik, layanan ini memastikan barang Anda dipindahkan dengan hati-hati dan tepat waktu. Kami menyediakan berbagai jenis kendaraan sesuai dengan ukuran dan jenis barang, mulai dari barang kecil hingga barang besar dan berat.\n\nDengan menggunakan teknologi terbaru, kami memastikan proses angkutan berjalan lancar, meminimalisir risiko kerusakan, dan memberikan kepuasan bagi pelanggan. Apakah Anda pindahan rumah, memindahkan peralatan bisnis, atau membutuhkan pengiriman barang dalam jumlah besar, layanan kami siap memenuhi kebutuhan Anda dengan kualitas terbaik.",
-    'tags': ['Servis', 'Panggilan', 'Cepat'],
-    'harga': 'Rp100.000 - 150.000',
+    'judul': 'Jasa Servis',
+    "jenis": 'Servis AC',
+    "lokasi": "Panggilan",
+    'harga': 'Rp100.000',
     "media": [
       "assets/logo/spesialis.jpg",
       "assets/logo/iot.jpg",
@@ -31,11 +32,12 @@ class LayananController extends GetxController {
       'id': '2',
       'nama': 'Budi',
       'waktu': DateTime.now().subtract(Duration(minutes: 10)),
-      'judul': 'Jasa Angkut Barang',
       'deskripsi':
           "Dalam era digital ini, teknologi telah membawa perubahan signifikan dalam berbagai sektor, termasuk pendidikan. Akses ke internet memungkinkan kita untuk belajar kapan saja dan di mana saja, membuka peluang tak terbatas untuk memperoleh pengetahuan. Namun, di balik kemudahan tersebut, ada tantangan dalam memilih sumber yang tepat dan menjaga keseimbangan antara pembelajaran mandiri dan interaksi sosial. Untuk itu, penting bagi kita untuk memanfaatkan teknologi secara bijaksana agar tetap dapat mengembangkan keterampilan dan membangun hubungan yang bermakna dalam proses belajar.",
-      'tags': ['Angkut', 'Panggilan'],
-      'harga': 'Rp200.000 - 300.000',
+      'judul': 'Jasa Angkut Barang',
+      "jenis": 'Servis AC',
+      "lokasi": "Mana Saja",
+      'harga': 'Rp200.000',
       'media': [
         "assets/logo/spesialis.jpg",
       ]
@@ -44,10 +46,12 @@ class LayananController extends GetxController {
       'id': '3',
       'nama': 'Sari',
       'waktu': DateTime.now().subtract(Duration(hours: 1)),
-      'judul': 'Rental Mobil Murah',
-      'deskripsi': 'Rental mobil harian dengan driver atau lepas kunci.',
-      'tags': ['Rental', 'Mobil'],
-      'harga': 'Rp350.000 - 500.000',
+      'judul': 'Jasa Rental',
+      'deskripsi':
+          'Rental mobil harian dengan driver atau lepas kunci terbaik.',
+      "jenis": 'Rental Mobil',
+      "lokasi": "Mana Saja",
+      'harga': 'Rp350.000',
       'media': [
         "assets/logo/spesialis.jpg",
         "assets/logo/spesialis.jpg",

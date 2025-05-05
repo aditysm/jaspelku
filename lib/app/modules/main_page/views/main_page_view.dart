@@ -115,15 +115,17 @@ class _MainPageViewState extends State<MainPageView> {
             },
             icon: const Icon(Icons.notifications),
           ),
-          IconButton(
-            tooltip: "Cari Layanan",
-            onPressed: () {
-              setState(() {
-                isSearching = true;
-              });
-            },
-            icon: const Icon(Icons.search),
-          ),
+          AllMaterial.isServant.isTrue
+              ? SizedBox.shrink()
+              : IconButton(
+                  tooltip: "Cari Layanan",
+                  onPressed: () {
+                    setState(() {
+                      isSearching = true;
+                    });
+                  },
+                  icon: const Icon(Icons.search),
+                ),
         ],
       );
     }
@@ -297,7 +299,8 @@ class _MainPageViewState extends State<MainPageView> {
         actions: [
           IconButton(
             tooltip: "Hubungi Admin",
-            onPressed: () => print("hi"),
+            onPressed: () =>
+                AllMaterial.messageScaffold(title: "Menampilkan chat admin"),
             icon: const Icon(
               Icons.headset_mic_outlined,
             ),
@@ -338,12 +341,16 @@ class _MainPageViewState extends State<MainPageView> {
       return;
     }
 
+    if (_selectedIndex == index) return;
+
     setState(() {
-      _selectedIndex = index > 2 ? index - 1 : index;
+      _selectedIndex = index;
     });
 
+    int targetPageIndex = index > 2 ? index - 1 : index;
+
     _pageController.animateToPage(
-      _selectedIndex,
+      targetPageIndex,
       duration: const Duration(milliseconds: 300),
       curve: Curves.ease,
     );
@@ -395,7 +402,10 @@ class _MainPageViewState extends State<MainPageView> {
           unselectedFontSize: 12,
           items: [
             BottomNavigationBarItem(
-              icon: const Icon(Icons.home),
+              icon: GestureDetector(
+                onDoubleTap: () => _onItemDoubleTapped(0),
+                child: const Icon(Icons.home),
+              ),
               label: 'Beranda',
             ),
             BottomNavigationBarItem(

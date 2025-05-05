@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:jaspelku/all_material.dart';
-import 'package:jaspelku/app/modules/main_page/views/main_page_view.dart';
 import 'package:jaspelku/app/modules/register/views/register_view.dart';
 import 'package:svg_flutter/svg.dart';
 
@@ -57,25 +56,51 @@ class LoginView extends GetView<LoginController> {
                     SizedBox(height: 32),
                     Text("Email"),
                     SizedBox(height: 8),
-                    AllMaterial.textField(
-                      controller: controller.emailC,
-                      focusNode: controller.emailF,
-                      hintText: "Masukkan email Anda...",
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AllMaterial.textField(
+                          controller: controller.emailC,
+                          focusNode: controller.emailF,
+                          hintText: "Masukkan email Anda...",
+                        ),
+                        Obx(() => controller.emailError.isNotEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 6.0),
+                                child: Text(
+                                  controller.emailError.value,
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              )
+                            : SizedBox.shrink()),
+                      ],
                     ),
                     SizedBox(height: 16),
                     Text("Kata Sandi"),
                     SizedBox(height: 8),
-                    Obx(
-                      () => AllMaterial.textField(
-                        textInputAction: TextInputAction.done,
-                        isPassword: true,
-                        obscureText: controller.isObscure.value,
-                        onToggleObscureText: () =>
-                            controller.isObscure.toggle(),
-                        controller: controller.passC,
-                        focusNode: controller.passF,
-                        hintText: "Masukkan kata sandi Anda...",
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Obx(() => AllMaterial.textField(
+                              textInputAction: TextInputAction.done,
+                              isPassword: true,
+                              obscureText: controller.isObscure.value,
+                              onToggleObscureText: () =>
+                                  controller.isObscure.toggle(),
+                              controller: controller.passC,
+                              focusNode: controller.passF,
+                              hintText: "Masukkan kata sandi Anda...",
+                            )),
+                        Obx(() => controller.passwordError.isNotEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 6.0),
+                                child: Text(
+                                  controller.passwordError.value,
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              )
+                            : SizedBox.shrink()),
+                      ],
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.max,
@@ -93,14 +118,20 @@ class LoginView extends GetView<LoginController> {
                         ),
                       ],
                     ),
+                    Obx(() => controller.allError.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 6.0),
+                            child: Text(
+                              controller.allError.value,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          )
+                        : SizedBox.shrink()),
                     SizedBox(height: 16),
                     AllMaterial.cusButton(
                       width: Get.width,
                       label: "Masuk",
-                      onTap: () {
-                        Get.offAll(() => MainPageView());
-                        AllMaterial.box.write("login", true);
-                      },
+                      onTap: controller.login,
                     ),
                     SizedBox(height: 24),
                     Row(

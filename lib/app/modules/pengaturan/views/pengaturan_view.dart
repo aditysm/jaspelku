@@ -5,11 +5,12 @@ import 'package:jaspelku/app/controller/general_controller.dart';
 import '../controllers/pengaturan_controller.dart';
 
 class PengaturanView extends GetView<PengaturanController> {
-  const PengaturanView({super.key});
+  @override
+  final controller = Get.put(PengaturanController());
+  PengaturanView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(PengaturanController());
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pengaturan'),

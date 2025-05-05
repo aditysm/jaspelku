@@ -7,6 +7,7 @@ class PostinganBaruController extends GetxController {
   RxString selectedOpsi = 'Sekali / Sehari'.obs;
   RxList<String> selectedHari = <String>[].obs;
 
+
   final List<String> allHari = [
     'Senin',
     'Selasa',
@@ -18,13 +19,13 @@ class PostinganBaruController extends GetxController {
   ];
   final selectedKategori = ''.obs;
   final selectedJenis = ''.obs;
+  final totalHarga = ''.obs;
   final selectedLokasi = ''.obs;
   final kebutuhanC = TextEditingController();
   final kebutuhanF = FocusNode();
-  final hargaMinC = TextEditingController();
+  final totalHargaC = TextEditingController();
   final waktuMulaiC = TextEditingController();
   final waktuSelesaiC = TextEditingController();
-  final hargaMaxC = TextEditingController();
 
   RxList<XFile> selectedMedia = <XFile>[].obs;
   final ImagePicker _picker = ImagePicker();
@@ -150,25 +151,17 @@ class PostinganBaruController extends GetxController {
     selectedMedia.removeAt(index);
   }
 
-  // Fungsi untuk memeriksa apakah media adalah video
   bool isVideo(XFile file) {
     final extension = file.path.split('.').last.toLowerCase();
     return ['mp4', 'mov', 'avi', 'mkv'].contains(extension);
   }
 
-  final Map<String, List<String>> jenisJasaMap = {
-    'Jasa Kebersihan': ['Cuci AC', 'Bersih Rumah', 'Bersih Kantor'],
-    'Jasa Teknisi': ['Perbaikan AC', 'Service Elektronik', 'Instalasi Listrik'],
-    'Jasa Kreatif': ['Desain Grafis', 'Fotografi', 'Videografi'],
-    'Jasa Transportasi': ['Kurir Motor', 'Rental Mobil', 'Pindahan Barang'],
-  };
 
-  // Fungsi untuk ambil jenis jasa berdasarkan kategori terpilih
+
   List<String> getJenisJasaByKategori(String kategori) {
-    return jenisJasaMap[kategori] ?? [];
+    return AllMaterial.jenisJasaMap[kategori] ?? [];
   }
 
-  // Opsional: reset semua pilihan
   void resetFilter() {
     selectedKategori.value = '';
     selectedJenis.value = '';
