@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:jaspelku/app/controller/general_controller.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:jaspelku/app/widget/random_topic_container.dart';
+import 'package:location/location.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
@@ -102,42 +104,64 @@ abstract class AllMaterial {
     Widget? suffix,
     Widget? prefix,
     bool enabled = false,
-    TextInputType? textInputType,
+    void Function()? onTap,
     Color? color,
+    TextInputType textInputType = TextInputType.text,
+    int? maxLines = 1,
     String? prefixText,
-    String? labelText,
+    int? limit,
+    String? errorText,
     TextInputAction? textInputAction = TextInputAction.next,
+    void Function(String)? onChanged,
+    void Function(String)? onSubmitted,
+    String? labelText,
+    bool isVerif = false,
   }) {
     return TextField(
+      maxLines: maxLines,
       keyboardType: textInputType,
       controller: controller,
       focusNode: focusNode,
+      onTap: onTap,
+      onSubmitted: onSubmitted,
       cursorColor: AllMaterial.colorPrimary,
       textInputAction: textInputAction,
       obscureText: isPassword ? (obscureText ?? true) : false,
       style: TextStyle(color: color),
+      onChanged: onChanged,
       onTapOutside: (_) {
         focusNode?.unfocus();
       },
       readOnly: enabled,
+      inputFormatters: textInputType == TextInputType.numberWithOptions()
+          ? [
+              LengthLimitingTextInputFormatter(limit),
+              FilteringTextInputFormatter.digitsOnly,
+            ]
+          : null,
       decoration: InputDecoration(
+        errorText: errorText,
         labelText: labelText,
-        labelStyle: TextStyle(
-          color: AllMaterial.isDarkMode.isTrue
-              ? AllMaterial.colorWhite
-              : AllMaterial.colorPrimary,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(
-            color: AllMaterial.colorStrokePrimary,
-          ),
-        ),
+        labelStyle: isVerif
+            ? null
+            : TextStyle(
+                color: AllMaterial.isDarkMode.isTrue
+                    ? AllMaterial.colorWhite
+                    : AllMaterial.colorPrimary,
+              ),
+        enabledBorder: isVerif
+            ? OutlineInputBorder(borderSide: BorderSide.none)
+            : OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: AllMaterial.colorStrokePrimary,
+                ),
+              ),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(
             color: AllMaterial.colorPrimary,
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(isVerif ? 4 : 10),
         ),
         hintText: hintText,
         prefixText: prefixText,
@@ -172,6 +196,23 @@ abstract class AllMaterial {
     );
   }
 
+  static Future<LocationData?> getCurrentLocation() async {
+    final Location _location = Location();
+    bool serviceEnabled = await _location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _location.requestService();
+      if (!serviceEnabled) return null;
+    }
+
+    PermissionStatus permissionGranted = await _location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) return null;
+    }
+
+    return await _location.getLocation();
+  }
+
   static void showLoadingDialog({bool barrierDismissible = false}) {
     Get.dialog(
       Dialog(
@@ -201,6 +242,121 @@ abstract class AllMaterial {
         ),
       ),
       barrierDismissible: barrierDismissible,
+    );
+  }
+
+  static void umpanPengguna(BuildContext context) {
+    final TextEditingController umpanController = TextEditingController();
+    final RxDouble rating = 0.0.obs;
+    var umpanError = "".obs;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: isDarkMode.value
+              ? Theme.of(context).cardColor
+              : AllMaterial.colorWhite,
+          title: const Text("Umpan Pengguna"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Berikan penilaian & saran untuk aplikasi ini."),
+              const SizedBox(height: 12),
+              Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    return IconButton(
+                      onPressed: () {
+                        rating.value = index + 1.0;
+                      },
+                      icon: Icon(
+                        Icons.star,
+                        color: (index < rating.value)
+                            ? Colors.orange
+                            : Colors.grey,
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Obx(
+                () => AllMaterial.textField(
+                  controller: umpanController,
+                  maxLines: 3,
+                  hintText: "Masukkan umpan balik Anda...",
+                  errorText: umpanError.isEmpty ? null : umpanError.value,
+                  textInputAction: TextInputAction.done,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(elevation: 0),
+              onPressed: () => Get.back(),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor:
+                    isDarkMode.value ? null : AllMaterial.colorPrimary,
+              ),
+              onPressed: () {
+                String umpan = umpanController.text.trim();
+                double nilaiRating = rating.value;
+
+                if (umpan.isNotEmpty && nilaiRating > 0) {
+                  // Misalnya kirim ke controller atau backend
+                  Get.back();
+                  ToastService.show("Umpan Balik Anda telah dikirim.");
+                } else {
+                  umpanError.value =
+                      "Isi umpan atau beri rating terlebih dahulu";
+                }
+              },
+              child: Text(
+                "Kirim",
+                style: TextStyle(
+                  color: isDarkMode.value ? null : AllMaterial.colorWhite,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static DropdownButtonFormField<String> buildDropdown({
+    required List<String> items,
+    required String? selectedValue,
+    required void Function(String?) onChanged,
+    required bool isDarkMode,
+    required String? hintText,
+  }) {
+    final color = isDarkMode ? null : colorWhite;
+
+    return DropdownButtonFormField<String>(
+      dropdownColor: color,
+      decoration: InputDecoration(
+        fillColor: color,
+        hintText: hintText,
+        border: OutlineInputBorder(),
+      ),
+      hint: Text("$hintText"),
+      value: (selectedValue?.isNotEmpty ?? false) ? selectedValue : null,
+      items: items.map((item) {
+        return DropdownMenuItem(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      isExpanded: true,
     );
   }
 
@@ -865,53 +1021,55 @@ abstract class AllMaterial {
   static void bottomSheetMore(int? itemCount, List<String?> label,
       List<void Function()?> onTap, List<Widget> icon) {
     Get.bottomSheet(
-      Material(
-        color: AllMaterial.isDarkMode.isTrue ? null : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(itemCount ?? 0, (index) {
-              return ListTile(
-                leading: icon[index],
-                title: Text(label[index] ?? ""),
-                onTap: onTap[index],
-              );
-            }),
+      SafeArea(
+        child: Material(
+          color: AllMaterial.isDarkMode.isTrue ? null : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(itemCount ?? 0, (index) {
+                return ListTile(
+                  leading: icon[index],
+                  title: Text(label[index] ?? ""),
+                  onTap: onTap[index],
+                );
+              }),
+            ),
           ),
         ),
       ),
     );
   }
 
-  static void messageScaffold({
-    required String title,
-    bool adaKendala = false,
-    void Function()? kendalaTap,
-    String? kendalaTitle,
-  }) {
-    if (Get.context != null) {
-      final estimatedSeconds = (title.length / 12).ceil();
-      final duration = Duration(
-        seconds: estimatedSeconds.clamp(2, 10),
-      );
+  // static void messageScaffold({
+  //   required String title,
+  //   bool adaKendala = false,
+  //   void Function()? kendalaTap,
+  //   String? kendalaTitle,
+  // }) {
+  //   if (Get.context != null) {
+  //     final estimatedSeconds = (title.length / 12).ceil();
+  //     final duration = Duration(
+  //       seconds: estimatedSeconds.clamp(2, 10),
+  //     );
 
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(
-          duration: duration,
-          content: Text(title),
-          action: adaKendala
-              ? SnackBarAction(
-                  textColor: AllMaterial.colorPrimary,
-                  label: kendalaTitle ?? "Lihat",
-                  onPressed: kendalaTap ?? () {},
-                )
-              : null,
-        ),
-      );
-    }
-  }
+  //     ScaffoldMessenger.of(Get.context!).showSnackBar(
+  //       SnackBar(
+  //         duration: duration,
+  //         content: Text(title),
+  //         action: adaKendala
+  //             ? SnackBarAction(
+  //                 textColor: AllMaterial.colorPrimary,
+  //                 label: kendalaTitle ?? "Lihat",
+  //                 onPressed: kendalaTap ?? () {},
+  //               )
+  //             : null,
+  //       ),
+  //     );
+  //   }
+  // }
 
   static String formatEmail(String email) {
     if (!email.contains('@')) return email;

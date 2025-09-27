@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/main_page/views/main_page_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:video_player/video_player.dart';
 import '../controllers/postingan_baru_controller.dart';
 
@@ -23,22 +24,22 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
     controller.waktuSelesaiC.text = controller.waktuSelesaiC.text.isNotEmpty
         ? controller.waktuSelesaiC.text
         : AllMaterial.formatTime24(defaultEnd);
-    final harga = int.tryParse(controller.totalHargaC.text) ?? 0;
 
     return Scaffold(
       appBar: AppBar(
         actions: [
           TextButton(
             onPressed: () {
-              if (harga == 0) {
-                AllMaterial.messageScaffold(
-                  title: "Tawaran Harga tidak boleh kosong",
+              if (controller.totalHargaC.text == "" ||
+                  controller.totalHargaC.text == 0) {
+                ToastService.show(
+                  "Tawaran Harga tidak boleh kosong",
                 );
               } else {
                 if (isTawaranBaru) {
                   Get.offAll(() => MainPageView());
-                  AllMaterial.messageScaffold(
-                    title: "Tawaran berhasil diajukan!",
+                  ToastService.show(
+                    "Tawaran berhasil diajukan!",
                   );
                 }
 
@@ -113,6 +114,7 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                           children: [
                             // Kategori
                             _buildTopic(
+                              isLokasi: false,
                               labelRx: controller.selectedKategori,
                               defaultLabel: "Kategori",
                               context: context,
@@ -129,6 +131,7 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                                   controller.getJenisJasaByKategori(
                                       controller.selectedKategori.value);
                               return _buildTopic(
+                                isLokasi: false,
                                 labelRx: controller.selectedJenis,
                                 defaultLabel: "Jenis Jasa",
                                 context: context,
@@ -137,8 +140,8 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                                 selected: controller.selectedJenis,
                                 controller: controller,
                                 isKategori: false,
-                                onEmpty: () => AllMaterial.messageScaffold(
-                                    title: "Pilih kategori terlebih dahulu"),
+                                onEmpty: () => ToastService.show(
+                                    "Pilih kategori terlebih dahulu"),
                                 enabled: jenisList.isNotEmpty,
                               );
                             }),
@@ -159,6 +162,7 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                                       'Online / Remote Service',
                                       'Mana Saja'
                                     ],
+                              isLokasi: true,
                               selected: controller.selectedLokasi,
                               controller: controller,
                               isKategori: false,
@@ -302,27 +306,29 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                         : AllMaterial.colorWhite,
                     context: context,
                     builder: (_) => SafeArea(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(height: 15),
-                          ListTile(
-                            leading: const Icon(Icons.photo_library),
-                            title: const Text("Dari Galeri"),
-                            onTap: () {
-                              Get.back();
-                              controller.pickMediaFromGallery();
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.photo_camera),
-                            title: const Text("Dari Kamera"),
-                            onTap: () {
-                              Get.back();
-                              controller.pickMediaFromCamera();
-                            },
-                          ),
-                        ],
+                      child: SafeArea(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(height: 15),
+                            ListTile(
+                              leading: const Icon(Icons.photo_library),
+                              title: const Text("Dari Galeri"),
+                              onTap: () {
+                                Get.back();
+                                controller.pickMediaFromGallery();
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.photo_camera),
+                              title: const Text("Dari Kamera"),
+                              onTap: () {
+                                Get.back();
+                                controller.pickMediaFromCamera();
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -354,15 +360,20 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
               Row(
                 children: [
                   Expanded(
-                    child: AllMaterial.textField(
-                      controller: controller.totalHargaC,
-                      color: AllMaterial.isDarkMode.isFalse
-                          ? AllMaterial.colorPrimary
-                          : null,
-                      labelText: "Harga",
-                      prefixText: "Rp ",
-                      textInputAction: TextInputAction.next,
-                      textInputType: TextInputType.number,
+                    child: Obx(
+                      () => AllMaterial.textField(
+                        controller: controller.totalHargaC,
+                        color: AllMaterial.isDarkMode.isFalse
+                            ? AllMaterial.colorPrimary
+                            : null,
+                        labelText: "Harga",
+                        prefixText: "Rp ",
+                        textInputAction: TextInputAction.next,
+                        errorText: controller.totalHargaError.isEmpty
+                            ? null
+                            : controller.totalHargaError.value,
+                        textInputType: TextInputType.number,
+                      ),
                     ),
                   ),
                 ],
@@ -393,10 +404,15 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                         }
                       },
                       child: AbsorbPointer(
-                        child: AllMaterial.textField(
-                          controller: controller.waktuMulaiC,
-                          labelText: "Waktu Mulai",
-                          prefix: Icon(Icons.access_time),
+                        child: Obx(
+                          () => AllMaterial.textField(
+                            controller: controller.waktuMulaiC,
+                            labelText: "Waktu Mulai",
+                            prefix: Icon(Icons.access_time),
+                            errorText: controller.waktuMulaiError.isEmpty
+                                ? null
+                                : controller.waktuMulaiError.value,
+                          ),
                         ),
                       ),
                     ),
@@ -428,10 +444,15 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                         }
                       },
                       child: AbsorbPointer(
-                        child: AllMaterial.textField(
-                          controller: controller.waktuSelesaiC,
-                          labelText: "Waktu Selesai",
-                          prefix: Icon(Icons.access_time),
+                        child: Obx(
+                          () => AllMaterial.textField(
+                            controller: controller.waktuSelesaiC,
+                            labelText: "Waktu Selesai",
+                            prefix: Icon(Icons.access_time),
+                            errorText: controller.waktuSelesaiError.isEmpty
+                                ? null
+                                : controller.waktuSelesaiError.value,
+                          ),
                         ),
                       ),
                     ),
@@ -449,6 +470,10 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
                       ? Color(0xFF121212)
                       : AllMaterial.colorWhite,
                   decoration: InputDecoration(
+                    errorText: (controller.selectedOpsi.value == "Kustom" &&
+                            controller.selectedHari.isEmpty)
+                        ? controller.hariKerjaError.value
+                        : null,
                     fillColor: AllMaterial.isDarkMode.isTrue
                         ? Color(0xFF121212)
                         : AllMaterial.colorWhite,
@@ -498,24 +523,23 @@ class PostinganBaruView extends GetView<PostinganBaruController> {
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: context.mediaQueryPadding.bottom + 16,
+          ),
           child: AllMaterial.cusButton(
             label: "Ajukan Tawaran",
             onTap: () {
-              if (harga == 0) {
-                AllMaterial.messageScaffold(
-                  title: "Tawaran Harga tidak boleh kosong",
+              if (isTawaranBaru) {
+                Get.offAll(() => MainPageView());
+                ToastService.show(
+                  "Tawaran berhasil diajukan!",
                 );
               } else {
-                if (isTawaranBaru) {
-                  Get.offAll(() => MainPageView());
-                  AllMaterial.messageScaffold(
-                    title: "Tawaran berhasil diajukan!",
-                  );
-                }
-                // logika posting
-                // Implement posting logic here
+                controller.validateForm();
               }
+              // logika posting
+              // Implement posting logic here
             },
           ),
         ),
@@ -533,6 +557,7 @@ Widget _buildTopic({
   required RxString selected,
   required PostinganBaruController controller,
   required bool isKategori,
+  required bool isLokasi,
   bool isSearch = false,
   bool enabled = true,
   VoidCallback? onEmpty,
@@ -549,6 +574,7 @@ Widget _buildTopic({
                   controller: controller,
                   isKategori: isKategori,
                   isSearch: isSearch,
+                  isLokasi: isLokasi,
                 )
             : (onEmpty ?? () {}),
       ));
@@ -562,6 +588,7 @@ void showTopicOptions({
   bool isSearch = false,
   required PostinganBaruController controller,
   required bool isKategori,
+  required bool isLokasi,
 }) {
   TextEditingController searchController = TextEditingController();
   List<String> originalOptions = options;
@@ -577,89 +604,101 @@ void showTopicOptions({
     builder: (context) => Material(
       color: AllMaterial.isDarkMode.isFalse ? Colors.white : Colors.black,
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                  bottom: 16, left: 20, right: 20, top: 16),
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                width: Get.height / 4.5,
-                height: 4,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.grey,
+        child: SizedBox(
+          height: isLokasi ? null : Get.height,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                    bottom: 16, left: 20, right: 20, top: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  width: Get.height / 4.5,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey,
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Get.back(),
-                    icon: const Icon(Icons.clear),
-                  ),
-                ],
-              ),
-            ),
-
-            (isSearch)
-                ? SizedBox.shrink()
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: TextField(
-                      controller: searchController,
-                      style: TextStyle(fontWeight: AllMaterial.fontRegular),
-                      decoration: InputDecoration(
-                        hintText: 'Cari...',
-                        hintStyle:
-                            TextStyle(fontWeight: AllMaterial.fontRegular),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Colors.grey),
-                        ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
-                      onChanged: (query) {
-                        filteredOptions.value = originalOptions
-                            .where((item) => item
-                                .toLowerCase()
-                                .contains(query.toLowerCase()))
-                            .toList();
-                      },
                     ),
-                  ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.clear),
+                    ),
+                  ],
+                ),
+              ),
 
-            isSearch ? SizedBox.shrink() : const SizedBox(height: 10),
+              (isSearch)
+                  ? SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TextField(
+                        controller: searchController,
+                        style: TextStyle(fontWeight: AllMaterial.fontRegular),
+                        textInputAction: TextInputAction.search,
+                        decoration: InputDecoration(
+                          hintText: 'Cari...',
+                          hintStyle:
+                              TextStyle(fontWeight: AllMaterial.fontRegular),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                        ),
+                        onSubmitted: (value) {
+                          filteredOptions.value = originalOptions
+                              .where((item) => item
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase()))
+                              .toList();
+                        },
+                        onChanged: (query) {
+                          filteredOptions.value = originalOptions
+                              .where((item) => item
+                                  .toLowerCase()
+                                  .contains(query.toLowerCase()))
+                              .toList();
+                        },
+                      ),
+                    ),
 
-            // List pilihan
-            Flexible(
-              child: Obx(
-                () => SingleChildScrollView(
-                  child: Column(
-                    children: filteredOptions
-                        .map((item) => ListTile(
-                              title: Text(item),
-                              onTap: () {
-                                selected.value = item;
-                                Get.back();
-                              },
-                            ))
-                        .toList(),
+              isSearch ? SizedBox.shrink() : const SizedBox(height: 10),
+
+              // List pilihan
+              Flexible(
+                child: Obx(
+                  () => SingleChildScrollView(
+                    child: Column(
+                      children: filteredOptions
+                          .map((item) => ListTile(
+                                title: Text(item),
+                                onTap: () {
+                                  selected.value = item;
+                                  Get.back();
+                                },
+                              ))
+                          .toList(),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/profil/views/profil_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:svg_flutter/svg.dart';
 import '../controllers/pencarian_controller.dart';
 
@@ -12,7 +13,6 @@ class PencarianView extends GetView<PencarianController> {
   @override
   Widget build(BuildContext context) {
     final PencarianController controller = Get.put(PencarianController());
-    controller.searchNode.unfocus();
     final filteredServants = controller.data.where((servant) {
       if (controller.selectedRating.value == 'high' &&
           (servant['rating'] ?? 0) < 4.0) {
@@ -218,9 +218,8 @@ class PencarianView extends GetView<PencarianController> {
                                 SizedBox(height: 10),
                                 AllMaterial.cusButton(
                                   onTap: () {
-                                    AllMaterial.messageScaffold(
-                                        title:
-                                            "Mengarahkan ke chat untuk menawar");
+                                    ToastService.show(
+                                        "Mengarahkan ke chat untuk menawar");
                                   },
                                   icon: Icon(
                                     Icons.swap_horizontal_circle_outlined,
@@ -298,7 +297,11 @@ class BuildEndDrawer extends StatelessWidget {
               spacing: 10,
               children: [
                 Obx(() => ChoiceChip(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: controller.selectedRating.value == 'high'
+                          ? Colors.transparent
+                          : (AllMaterial.isDarkMode.isTrue
+                              ? Colors.transparent
+                              : Colors.white),
                       selectedColor: AllMaterial.colorPrimary,
                       checkmarkColor: AllMaterial.colorWhite,
                       label: Text(
@@ -317,7 +320,11 @@ class BuildEndDrawer extends StatelessWidget {
                       },
                     )),
                 Obx(() => ChoiceChip(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: controller.selectedRating.value == 'high'
+                          ? Colors.transparent
+                          : (AllMaterial.isDarkMode.isTrue
+                              ? Colors.transparent
+                              : Colors.white),
                       selectedColor: AllMaterial.colorPrimary,
                       checkmarkColor: AllMaterial.colorWhite,
                       label: Text(
@@ -343,7 +350,11 @@ class BuildEndDrawer extends StatelessWidget {
               spacing: 10,
               children: [
                 Obx(() => ChoiceChip(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: controller.selectedRating.value == 'high'
+                          ? Colors.transparent
+                          : (AllMaterial.isDarkMode.isTrue
+                              ? Colors.transparent
+                              : Colors.white),
                       selectedColor: AllMaterial.colorPrimary,
                       checkmarkColor: AllMaterial.colorWhite,
                       label: Text(
@@ -362,7 +373,11 @@ class BuildEndDrawer extends StatelessWidget {
                       },
                     )),
                 Obx(() => ChoiceChip(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: controller.selectedRating.value == 'high'
+                          ? Colors.transparent
+                          : (AllMaterial.isDarkMode.isTrue
+                              ? Colors.transparent
+                              : Colors.white),
                       selectedColor: AllMaterial.colorPrimary,
                       checkmarkColor: AllMaterial.colorWhite,
                       label: Text(
@@ -386,32 +401,17 @@ class BuildEndDrawer extends StatelessWidget {
             Text('Kategori Jasa'),
             SizedBox(height: 10),
             Obx(() {
-              return DropdownButtonFormField<String>(
-                dropdownColor: AllMaterial.isDarkMode.isTrue
-                    ? Color(0xFF121212)
-                    : AllMaterial.colorWhite,
-                decoration: InputDecoration(
-                  fillColor: AllMaterial.isDarkMode.isTrue
-                      ? Color(0xFF121212)
-                      : AllMaterial.colorWhite,
-                  hintText: "Pilih Kategori Jasa",
-                  border: OutlineInputBorder(),
-                ),
-                hint: Text('Pilih Kategori Jasa'),
-                value: controller.selectedKategori.value.isNotEmpty
+              return AllMaterial.buildDropdown(
+                items: AllMaterial.jenisJasaMap.keys.toList(),
+                selectedValue: controller.selectedKategori.value.isNotEmpty
                     ? controller.selectedKategori.value
                     : null,
-                items: AllMaterial.jenisJasaMap.keys.toList().map((kategori) {
-                  return DropdownMenuItem(
-                    value: kategori,
-                    child: Text(kategori),
-                  );
-                }).toList(),
                 onChanged: (value) {
                   controller.selectedKategori.value = value ?? "";
                   controller.jenisJasa.value = "";
                 },
-                isExpanded: true,
+                isDarkMode: AllMaterial.isDarkMode.value,
+                hintText: 'Pilih Kategori Jasa',
               );
             }),
             SizedBox(height: 20),
@@ -422,33 +422,21 @@ class BuildEndDrawer extends StatelessWidget {
                   .getJenisJasaByKategori(controller.selectedKategori.value)
                   .toSet()
                   .toList();
-              return DropdownButtonFormField<String>(
-                dropdownColor: AllMaterial.isDarkMode.isTrue
-                    ? Color(0xFF121212)
-                    : AllMaterial.colorWhite,
-                decoration: InputDecoration(
-                  fillColor: AllMaterial.isDarkMode.isTrue
-                      ? Color(0xFF121212)
-                      : AllMaterial.colorWhite,
-                  hintText: "Pilih Jenis Jasa",
-                  border: OutlineInputBorder(),
-                ),
-                value: jenisJasaList.contains(controller.jenisJasa.value)
-                    ? controller.jenisJasa.value
-                    : null,
-                hint: Text('Pilih Jenis Jasa'),
-                items: jenisJasaList.map((jenis) {
-                  return DropdownMenuItem(
-                    value: jenis,
-                    child: Text(jenis),
-                  );
-                }).toList(),
+              return AllMaterial.buildDropdown(
+                items: AllMaterial.jenisJasaMap.keys.toList(),
+                selectedValue:
+                    jenisJasaList.contains(controller.jenisJasa.value)
+                        ? controller.jenisJasa.value
+                        : null,
                 onChanged: controller.selectedKategori.value.isEmpty
-                    ? null
+                    ? (_) {
+                        null;
+                      }
                     : (value) {
                         controller.jenisJasa.value = value ?? "";
                       },
-                isExpanded: true,
+                isDarkMode: AllMaterial.isDarkMode.value,
+                hintText: "Pilih Jenis Jasa",
               );
             }),
             SizedBox(height: 20),

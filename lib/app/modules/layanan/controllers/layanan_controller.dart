@@ -10,7 +10,7 @@ class LayananController extends GetxController {
 
   final postinganSaya = {
     'id': '1',
-    'nama': 'Kamu',
+    'nama': 'John Borino (Anda)',
     'waktu': DateTime.now().subtract(Duration(minutes: 2)),
     'deskripsi':
         "Layanan angkut barang profesional menawarkan solusi efisien dan aman untuk memenuhi kebutuhan transportasi barang dalam berbagai skala. Dengan tim yang terlatih dan pengalaman di bidang logistik, layanan ini memastikan barang Anda dipindahkan dengan hati-hati dan tepat waktu. Kami menyediakan berbagai jenis kendaraan sesuai dengan ukuran dan jenis barang, mulai dari barang kecil hingga barang besar dan berat.\n\nDengan menggunakan teknologi terbaru, kami memastikan proses angkutan berjalan lancar, meminimalisir risiko kerusakan, dan memberikan kepuasan bagi pelanggan. Apakah Anda pindahan rumah, memindahkan peralatan bisnis, atau membutuhkan pengiriman barang dalam jumlah besar, layanan kami siap memenuhi kebutuhan Anda dengan kualitas terbaik.",

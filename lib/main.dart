@@ -1,24 +1,68 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/login/views/login_view.dart';
 import 'package:jaspelku/app/modules/main_page/views/main_page_view.dart';
 import 'package:jaspelku/app/modules/pengenalan/views/pengenalan_view.dart';
-import 'package:jaspelku/app/widget/splash_screen.dart';
-
 import 'app/routes/app_pages.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await initializeDateFormatting('id_ID', null);
-  WidgetsFlutterBinding.ensureInitialized();
-  var isDark = AllMaterial.box.read('isDarkMode');
-  AllMaterial.isDarkMode.value = isDark ?? false;
-  runApp(
-    GetMaterialApp(
+
+  final box = GetStorage();
+
+  final bool isLogged = box.read("login") == true;
+  final bool sudahPengenalan = box.read("sudahPengenalan") == true;
+  final dynamic isDarkRaw = box.read('isDarkMode');
+  final String? role = box.read("role");
+
+  ThemeMode themeMode;
+  if (isDarkRaw is bool) {
+    themeMode = isDarkRaw ? ThemeMode.dark : ThemeMode.light;
+  } else {
+    themeMode = ThemeMode.system;
+  }
+
+  AllMaterial.isDarkMode.value = isDarkRaw is bool
+      ? isDarkRaw
+      : WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+
+  AllMaterial.isServant.value = role == "servant";
+
+  Widget defaultPage;
+  if (isLogged) {
+    defaultPage = MainPageView();
+  } else if (!sudahPengenalan) {
+    defaultPage = PengenalanView();
+  } else {
+    defaultPage = const LoginView();
+  }
+
+  runApp(MyApp(
+    defaultPage: defaultPage,
+    themeMode: themeMode,
+  ));
+}
+
+class MyApp extends StatelessWidget {
+  final Widget defaultPage;
+  final ThemeMode themeMode;
+
+  const MyApp({
+    super.key,
+    required this.defaultPage,
+    required this.themeMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
       theme: ThemeData.light().copyWith(
         colorScheme: ColorScheme.fromSeed(seedColor: AllMaterial.colorPrimary),
         primaryColorLight: AllMaterial.colorWhite,
@@ -30,6 +74,7 @@ void main() async {
           backgroundColor: AllMaterial.colorWhite,
           surfaceTintColor: AllMaterial.colorWhite,
         ),
+        dividerColor: const Color(0xFFE9E9E9),
       ),
       darkTheme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF121212),
@@ -53,6 +98,7 @@ void main() async {
           backgroundColor: Color(0xFF121212),
           surfaceTintColor: Color(0xFF121212),
         ),
+        dividerColor: const Color(0xFF2C2C2C),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: const Color(0xFF121212),
@@ -68,43 +114,9 @@ void main() async {
           ),
         ),
       ),
-      themeMode: isDark != null
-          ? isDark
-              ? ThemeMode.dark
-              : ThemeMode.light
-          : ThemeMode.system,
-      debugShowCheckedModeBanner: false,
       title: "Jasa Pelayanan Ku",
-      home: FutureBuilder(
-        future: Future.delayed(const Duration(seconds: 2)),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SplashScreen();
-          } else {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              // var controller = Get.put(GenerateKelompokController());
-              // controller.loadHistory();
-            });
-            bool isLogged = AllMaterial.box.read("login") ?? false;
-
-            if (isLogged) {
-              var role =
-                  AllMaterial.box.read("role") == "servant" ? true : false;
-              AllMaterial.isServant.value = role;
-
-              return MainPageView();
-            }
-            bool sudahPengenalan =
-                AllMaterial.box.read("sudahPengenalan") ?? false;
-            if (!sudahPengenalan) {
-              return PengenalanView();
-            } else {
-              return const LoginView();
-            }
-          }
-        },
-      ),
       getPages: AppPages.routes,
-    ),
-  );
+      home: defaultPage,
+    );
+  }
 }

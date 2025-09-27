@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/pengenalan_controller.dart';
 
-class PengenalanView extends GetView<PengenalanController> {
+class PengenalanView extends StatelessWidget {
   const PengenalanView({super.key});
 
   @override
@@ -15,28 +15,28 @@ class PengenalanView extends GetView<PengenalanController> {
         'title': 'Selamat Datang di Jaspelku',
         'desc':
             'Ekosistem pelayanan untuk semua kalangan.\nDekat, Cepat & Terpercaya!',
-        'image': 'assets/logo/intro-1.jpg',
         'icon': Icons.diversity_3,
+        'image': "assets/logo/intro-1.jpg"
       },
       {
         'title': 'Akses Dalam Genggaman',
         'desc':
             'Nikmati layanan jasa dari orang-orang hebat tanpa ribet, cukup lewat satu aplikasi.',
-        'image': 'assets/logo/intro-2.jpg',
         'icon': Icons.mobile_friendly,
+        'image': "assets/logo/intro-2.jpg"
       },
       {
         'title': 'Terbuka dan Inklusif',
         'desc': 'Siapa pun bisa mengakses dan memberi pelayanan dengan aman.',
-        'image': 'assets/logo/intro-3.jpg',
-        'icon': Icons.diversity_3,
+        'icon': Icons.diversity_1,
+        'image': "assets/logo/intro-3.jpg"
       },
       {
         'title': 'Mulai Sekarang',
         'desc':
             'Gabung ke dalam ekosistem Jaspelku.\nNikmati pengalaman tak terlupakan!',
-        'image': 'assets/logo/intro-4.jpg',
         'icon': Icons.rocket_launch,
+        'image': "assets/logo/intro-4.jpg"
       },
     ];
 
@@ -70,6 +70,7 @@ class PengenalanView extends GetView<PengenalanController> {
                     Image.asset(
                       page['image']!.toString(),
                       fit: BoxFit.cover,
+                      gaplessPlayback: true,
                     ),
                     BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
@@ -109,8 +110,8 @@ class PengenalanView extends GetView<PengenalanController> {
                                     ),
                           ),
                           Obx(() => controller.isLast.value
-                              ? SizedBox(height: 15)
-                              : SizedBox.shrink()),
+                              ? const SizedBox(height: 15)
+                              : const SizedBox.shrink()),
                           Obx(
                             () => controller.isLast.value
                                 ? ElevatedButton(
@@ -136,10 +137,8 @@ class PengenalanView extends GetView<PengenalanController> {
               );
             },
           ),
-
-          // Indikator strip
           Positioned(
-            bottom: context.mediaQueryPadding.bottom + 5,
+            bottom: context.mediaQueryPadding.bottom + 10,
             left: 0,
             right: 0,
             child: Obx(() {

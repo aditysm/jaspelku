@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/controller/general_controller.dart';
 import 'package:jaspelku/app/modules/edit_profil/views/edit_profil_view.dart';
 import 'package:jaspelku/app/modules/histori_pesanan/views/histori_pesanan_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:jaspelku/app/widget/random_tag_container.dart';
 
 import '../controllers/profil_controller.dart';
@@ -48,14 +49,14 @@ class ProfilView extends GetView<ProfilController> {
                       [
                         () {
                           Get.back();
-                          AllMaterial.messageScaffold(
-                            title: "Menghubungi Servant",
+                          ToastService.show(
+                            "Menghubungi Servant",
                           );
                         },
                         () {
                           Get.back();
-                          AllMaterial.messageScaffold(
-                            title: "Laporkan Servant",
+                          ToastService.show(
+                            "Laporkan Servant",
                           );
                         },
                       ],
@@ -115,8 +116,7 @@ class ProfilView extends GetView<ProfilController> {
                     color: AllMaterial.colorWhite,
                   ),
                   onTap: () {
-                    AllMaterial.messageScaffold(
-                        title: "Mengarahkan ke chat untuk menawar");
+                    ToastService.show("Mengarahkan ke chat untuk menawar");
                   },
                 ),
               ),
@@ -279,9 +279,8 @@ class ServantProfile extends StatelessWidget {
             ? InkWell(
                 onTap: () {
                   // Get.to(() => PencarianView());
-                  AllMaterial.messageScaffold(
-                      title:
-                          "Mengarahkan pada edit profil yang menampilkan pengalaman");
+                  ToastService.show(
+                      "Mengarahkan pada edit profil yang menampilkan pengalaman");
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
@@ -363,9 +362,8 @@ class ServantProfile extends StatelessWidget {
             ? InkWell(
                 onTap: () {
                   // Get.to(() => PencarianView());
-                  AllMaterial.messageScaffold(
-                      title:
-                          "Mengarahkan pada edit profil yang menampilkan sertifikat");
+                  ToastService.show(
+                      "Mengarahkan pada edit profil yang menampilkan sertifikat");
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
@@ -447,8 +445,7 @@ class ServantProfile extends StatelessWidget {
             ? InkWell(
                 onTap: () {
                   // Get.to(() => PencarianView());
-                  AllMaterial.messageScaffold(
-                      title: "Mengarahkan pada list ulasan terbaru");
+                  ToastService.show("Mengarahkan pada list ulasan terbaru");
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
@@ -560,8 +557,7 @@ class VendeeProfile extends StatelessWidget {
         InkWell(
           onTap: () {
             // Get.to(() => PencarianView());
-            AllMaterial.messageScaffold(
-                title: "Mengarahkan pada list histori pemesanan");
+            ToastService.show("Mengarahkan pada list histori pemesanan");
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),

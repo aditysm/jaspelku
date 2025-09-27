@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 
 class PencarianController extends GetxController {
   var selectedRating = "".obs;

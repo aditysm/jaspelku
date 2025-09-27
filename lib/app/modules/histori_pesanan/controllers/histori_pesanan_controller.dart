@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 enum MetodePembayaran { jaspelCoin, midtrans }
@@ -17,14 +17,14 @@ class HistoriPesananController extends GetxController {
 
   void bayarSekarang() {
     if (selectedMethod.value == MetodePembayaran.jaspelCoin) {
-      AllMaterial.messageScaffold(title: "Diproses dengan Jaspel Coin");
+      ToastService.show("Diproses dengan Jaspel Coin");
     } else if (selectedMethod.value == MetodePembayaran.midtrans) {
       final paymentUrl =
           "https://app.sandbox.midtrans.com/snap/v2/vtweb/12345678-aaaa-bbbb-cccc-123456789abc";
       showMidtransWebView(paymentUrl);
     } else {
-      AllMaterial.messageScaffold(
-        title: "Silakan pilih metode pembayaran terlebih dahulu",
+      ToastService.show(
+        "Silakan pilih metode pembayaran terlebih dahulu",
       );
     }
   }
@@ -61,25 +61,27 @@ class HistoriPesananController extends GetxController {
     );
   }
 
-  final dataRating = [ {
-    'id': '2',
-    'nama': 'Budi',
-    'waktu': DateTime.now().subtract(Duration(minutes: 10)),
-    'judul': 'Jasa Angkut Barang',
-    'deskripsi':
-        "Pelayanan cepat dan ramah! Barang sampai dengan aman tanpa kerusakan. Sopir juga sangat membantu saat proses angkut. Sangat direkomendasikan!",
-    'tags': ['Angkut', 'Panggilan'],
-    'harga': 'Rp200.000 - 300.000',
-    'rating': 4,
-    'jam_kerja': "8 jam (12.00 - 20.00)",
-    'hari_kerja': [
-      "Senin",
-      "Selasa",
-      "Rabu",
-      "Minggu",
-    ],
-    'media': [
-      "assets/logo/spesialis.jpg",
-    ]
-  }].obs;
+  final dataRating = [
+    {
+      'id': '2',
+      'nama': 'Budi',
+      'waktu': DateTime.now().subtract(Duration(minutes: 10)),
+      'judul': 'Jasa Angkut Barang',
+      'deskripsi':
+          "Pelayanan cepat dan ramah! Barang sampai dengan aman tanpa kerusakan. Sopir juga sangat membantu saat proses angkut. Sangat direkomendasikan!",
+      'tags': ['Angkut', 'Panggilan'],
+      'harga': 'Rp200.000 - 300.000',
+      'rating': 4,
+      'jam_kerja': "8 jam (12.00 - 20.00)",
+      'hari_kerja': [
+        "Senin",
+        "Selasa",
+        "Rabu",
+        "Minggu",
+      ],
+      'media': [
+        "assets/logo/spesialis.jpg",
+      ]
+    }
+  ].obs;
 }

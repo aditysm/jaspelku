@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/postingan_baru/views/postingan_baru_view.dart';
+import 'package:jaspelku/app/modules/profil/views/profil_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import '../controllers/chat_room_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -28,25 +30,32 @@ class ChatRoomView extends GetView<ChatRoomController> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: Row(
-          children: [
-            AllMaterial.avatarWidget(name: arg["nama"]),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AllMaterial.namaDenganVerified(
-                    name: AllMaterial.formatNamaPanjang(
-                      arg["nama"],
-                    ),
-                    isVerified: arg["isVerified"]),
-                Text(
-                  'Sedang aktif',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-          ],
+        title: InkWell(
+          onTap: () {
+            Get.to(() => ProfilView(), arguments: {
+              "searchProfile": true,
+            });
+          },
+          child: Row(
+            children: [
+              AllMaterial.avatarWidget(name: arg["nama"]),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AllMaterial.namaDenganVerified(
+                      name: AllMaterial.formatNamaPanjang(
+                        arg["nama"],
+                      ),
+                      isVerified: arg["isVerified"]),
+                  Text(
+                    'Sedang aktif',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         actions: [
           Obx(
@@ -65,7 +74,7 @@ class ChatRoomView extends GetView<ChatRoomController> {
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
-              AllMaterial.messageScaffold(title: "Menampilkan aksi lainnya");
+              ToastService.show("Menampilkan aksi lainnya");
             },
           ),
         ],
@@ -255,8 +264,8 @@ class ChatRoomView extends GetView<ChatRoomController> {
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () {
-                      AllMaterial.messageScaffold(
-                        title: "Fitur sedang digarap, coba lagi nanti!",
+                      ToastService.show(
+                        "Fitur sedang digarap, coba lagi nanti!",
                       );
                     },
                   ),

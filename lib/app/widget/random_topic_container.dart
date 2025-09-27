@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 
 // ignore: must_be_immutable
 class RandomTopicContainer extends StatefulWidget {

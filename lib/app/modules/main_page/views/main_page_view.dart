@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/home/views/home_view.dart';
 import 'package:jaspelku/app/modules/layanan/controllers/layanan_controller.dart';
 import 'package:jaspelku/app/modules/layanan/views/layanan_view.dart';
@@ -13,6 +13,7 @@ import 'package:jaspelku/app/modules/pesan/views/pesan_view.dart';
 import 'package:jaspelku/app/modules/postingan_baru/views/postingan_baru_view.dart';
 import 'package:jaspelku/app/modules/profil/views/profil_view.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:svg_flutter/svg.dart';
 
 class MainPageView extends StatefulWidget {
@@ -299,8 +300,7 @@ class _MainPageViewState extends State<MainPageView> {
         actions: [
           IconButton(
             tooltip: "Hubungi Admin",
-            onPressed: () =>
-                AllMaterial.messageScaffold(title: "Menampilkan chat admin"),
+            onPressed: () => ToastService.show("Menampilkan chat admin"),
             icon: const Icon(
               Icons.headset_mic_outlined,
             ),
@@ -374,86 +374,100 @@ class _MainPageViewState extends State<MainPageView> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: appBarBuilder(),
-      body: PageView(
-        controller: _pageController,
-        physics: const BouncingScrollPhysics(),
-        onPageChanged: (index) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (_selectedIndex != 0) {
           setState(() {
-            _selectedIndex = index >= 2 ? index + 1 : index;
+            _selectedIndex = 0;
+            _pageController.jumpToPage(0);
           });
-        },
-        children: buildScreens(),
-      ),
-      bottomNavigationBar: Obx(
-        () => BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor:
-              AllMaterial.isDarkMode.isFalse ? AllMaterial.colorWhite : null,
-          selectedItemColor: AllMaterial.isDarkMode.value
-              ? AllMaterial.colorWhite
-              : AllMaterial.colorComplementaryBlue,
-          unselectedItemColor: Colors.grey,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          items: [
-            BottomNavigationBarItem(
-              icon: GestureDetector(
-                onDoubleTap: () => _onItemDoubleTapped(0),
-                child: const Icon(Icons.home),
+          return false; // Jangan keluar, hanya arahkan ke index 0
+        }
+        return true; // Sudah di beranda, izinkan keluar
+      },
+      child: Scaffold(
+        appBar: appBarBuilder(),
+        body: PageView(
+          pageSnapping: true,
+          controller: _pageController,
+          physics: const BouncingScrollPhysics(),
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index >= 2 ? index + 1 : index;
+            });
+          },
+          children: buildScreens(),
+        ),
+        bottomNavigationBar: Obx(
+          () => BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor:
+                AllMaterial.isDarkMode.isFalse ? AllMaterial.colorWhite : null,
+            selectedItemColor: AllMaterial.isDarkMode.value
+                ? AllMaterial.colorWhite
+                : AllMaterial.colorComplementaryBlue,
+            unselectedItemColor: Colors.grey,
+            selectedFontSize: 12,
+            unselectedFontSize: 12,
+            items: [
+              BottomNavigationBarItem(
+                icon: GestureDetector(
+                  onDoubleTap: () => _onItemDoubleTapped(0),
+                  child: const Icon(Icons.home),
+                ),
+                label: 'Beranda',
               ),
-              label: 'Beranda',
-            ),
-            BottomNavigationBarItem(
-              icon: GestureDetector(
-                onDoubleTap: () => _onItemDoubleTapped(1),
-                child: const Icon(Icons.home_repair_service),
+              BottomNavigationBarItem(
+                icon: GestureDetector(
+                  onDoubleTap: () => _onItemDoubleTapped(1),
+                  child: const Icon(Icons.home_repair_service),
+                ),
+                label: 'Layanan',
               ),
-              label: 'Layanan',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.add_sharp),
-              label: 'Posting',
-            ),
-            BottomNavigationBarItem(
-              icon: GestureDetector(
-                onDoubleTap: () => _onItemDoubleTapped(3),
-                child: Obx(
-                  () => (messCont.filteredChat.isEmpty)
-                      ? const Icon(Icons.mail)
-                      : badges.Badge(
-                          position: badges.BadgePosition.topEnd(),
-                          showBadge: true,
-                          badgeStyle: const badges.BadgeStyle(
-                            badgeColor: AllMaterial.colorPrimary,
-                            padding: EdgeInsets.all(6),
-                            elevation: 0,
-                          ),
-                          badgeContent: Obx(
-                            () => Text(
-                              '${messCont.filteredChat.length}',
-                              style: TextStyle(
-                                color: AllMaterial.colorWhite,
-                                fontSize: 12,
-                                fontWeight: AllMaterial.fontBold,
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.add_sharp),
+                label: 'Posting',
+              ),
+              BottomNavigationBarItem(
+                icon: GestureDetector(
+                  onDoubleTap: () => _onItemDoubleTapped(3),
+                  child: Obx(
+                    () => (messCont.filteredChat.isEmpty)
+                        ? const Icon(Icons.mail)
+                        : badges.Badge(
+                            position: badges.BadgePosition.topEnd(),
+                            showBadge: true,
+                            badgeStyle: const badges.BadgeStyle(
+                              badgeColor: AllMaterial.colorPrimary,
+                              padding: EdgeInsets.all(6),
+                              elevation: 0,
+                            ),
+                            badgeContent: Obx(
+                              () => Text(
+                                '${messCont.filteredChat.length}',
+                                style: TextStyle(
+                                  color: AllMaterial.colorWhite,
+                                  fontSize: 12,
+                                  fontWeight: AllMaterial.fontBold,
+                                ),
                               ),
                             ),
+                            child: const Icon(Icons.mail),
                           ),
-                          child: const Icon(Icons.mail),
-                        ),
+                  ),
                 ),
+                label: 'Pesan',
               ),
-              label: 'Pesan',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.person),
-              label: 'Profil',
-            ),
-          ],
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.person),
+                label: 'Profil',
+              ),
+            ],
+          ),
         ),
       ),
     );

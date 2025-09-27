@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/register/views/register_view.dart';
 import 'package:svg_flutter/svg.dart';
 
@@ -63,16 +63,10 @@ class LoginView extends GetView<LoginController> {
                           controller: controller.emailC,
                           focusNode: controller.emailF,
                           hintText: "Masukkan email Anda...",
+                          errorText: controller.emailError.isEmpty
+                              ? null
+                              : controller.emailError.value,
                         ),
-                        Obx(() => controller.emailError.isNotEmpty
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 6.0),
-                                child: Text(
-                                  controller.emailError.value,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              )
-                            : SizedBox.shrink()),
                       ],
                     ),
                     SizedBox(height: 16),
@@ -81,25 +75,27 @@ class LoginView extends GetView<LoginController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Obx(() => AllMaterial.textField(
-                              textInputAction: TextInputAction.done,
-                              isPassword: true,
-                              obscureText: controller.isObscure.value,
-                              onToggleObscureText: () =>
-                                  controller.isObscure.toggle(),
-                              controller: controller.passC,
-                              focusNode: controller.passF,
-                              hintText: "Masukkan kata sandi Anda...",
-                            )),
-                        Obx(() => controller.passwordError.isNotEmpty
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 6.0),
-                                child: Text(
-                                  controller.passwordError.value,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              )
-                            : SizedBox.shrink()),
+                        Obx(
+                          () => AllMaterial.textField(
+                            textInputAction: TextInputAction.done,
+                            isPassword: true,
+                            onSubmitted: (p0) {
+                              if (controller.emailC.text.trim().isNotEmpty &&
+                                  controller.passC.text.trim().isNotEmpty) {
+                                controller.login();
+                              }
+                            },
+                            obscureText: controller.isObscure.value,
+                            onToggleObscureText: () =>
+                                controller.isObscure.toggle(),
+                            controller: controller.passC,
+                            focusNode: controller.passF,
+                            hintText: "Masukkan kata sandi Anda...",
+                            errorText: controller.passwordError.isEmpty
+                                ? null
+                                : controller.passwordError.value,
+                          ),
+                        ),
                       ],
                     ),
                     Row(

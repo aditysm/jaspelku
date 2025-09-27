@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/home/controllers/home_controller.dart';
 import 'package:jaspelku/app/modules/main_page/views/main_page_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 
 import '../controllers/histori_pesanan_controller.dart';
 
@@ -154,11 +155,11 @@ class HistoriPesananView extends GetView<HistoriPesananController> {
                     title: "Membayar Pesanan?",
                     subtitle: "Aksi setelahnya tidak dapat dibatalkan",
                     onConfirm: () {
+                      Get.back();
                       HomeController.isPesananAktif.value = true;
                       Get.offAll(() => MainPageView());
-                      AllMaterial.messageScaffold(
-                          title:
-                              "Pesanan telah dibayar! Servant akan diberitahu");
+                      ToastService.show(
+                          "Pesanan telah dibayar! Servant akan diberitahu");
                     },
                     onCancel: () => Get.back(),
                   );
@@ -167,6 +168,7 @@ class HistoriPesananView extends GetView<HistoriPesananController> {
                     title: "Membayar Pesanan?",
                     subtitle: "Aksi setelahnya tidak dapat dibatalkan",
                     onConfirm: () {
+                      Get.back();
                       controller.bayarSekarang();
                     },
                     onCancel: () => Get.back(),
@@ -180,13 +182,10 @@ class HistoriPesananView extends GetView<HistoriPesananController> {
                   onConfirm: () {
                     HomeController.isPesananAktif.value = false;
                     Get.back();
-                    AllMaterial.messageScaffold(
-                      title: AllMaterial.isServant.value
+                    ToastService.show(
+                      AllMaterial.isServant.value
                           ? "Ajuan pembatalan berhasil!"
                           : "Pesanan berhasil dibatalkan!",
-                      adaKendala: true,
-                      kendalaTitle: "Laporkan",
-                      kendalaTap: () {},
                     );
                   },
                   onCancel: () => Get.back(),
@@ -236,8 +235,10 @@ class HistoriPesananView extends GetView<HistoriPesananController> {
                             ),
                             SafeArea(
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical:
+                                        context.mediaQueryPadding.bottom / 2),
                                 child: AllMaterial.cusButton(
                                   label: "Tutup Ulasan",
                                   icon: Icon(Icons.clear,

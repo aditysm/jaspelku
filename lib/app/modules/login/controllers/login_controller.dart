@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/main_page/views/main_page_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 
 class LoginController extends GetxController {
   var isObscure = true.obs;
@@ -56,6 +57,7 @@ class LoginController extends GetxController {
 
     if (emailError.isNotEmpty || passwordError.isNotEmpty) return;
 
+    update();
     AllMaterial.showLoadingDialog();
 
     await Future.delayed(const Duration(milliseconds: 400));
@@ -73,8 +75,8 @@ class LoginController extends GetxController {
     Get.back();
     AllMaterial.box.write("login", true);
     Get.offAll(() => const MainPageView());
-    AllMaterial.messageScaffold(
-      title: "Autentikasi Berhasil, Selamat Datang!",
+    ToastService.show(
+      "Autentikasi Berhasil, Selamat Datang!",
     );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/chat_room/views/chat_room_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import '../controllers/pesan_controller.dart';
 
 class PesanView extends GetView<PesanController> {
@@ -92,7 +93,7 @@ class PesanView extends GetView<PesanController> {
           Icons.headset_mic_sharp,
         ),
         onPressed: () {
-          AllMaterial.messageScaffold(title: "Menampilkan chat admin");
+          ToastService.show("Menampilkan chat admin");
         },
       ),
     );

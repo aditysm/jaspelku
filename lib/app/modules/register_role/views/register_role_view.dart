@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/main_page/views/main_page_view.dart';
+import 'package:jaspelku/app/modules/syarat_ketentuan/views/syarat_ketentuan_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:flutter/gestures.dart'; // Untuk GestureRecognizer
 
@@ -55,6 +57,9 @@ class RegisterRoleView extends GetView<RegisterRoleController> {
                     ),
                     SizedBox(height: 32),
                     Material(
+                      color: AllMaterial.isDarkMode.value
+                          ? null
+                          : AllMaterial.colorWhite,
                       borderRadius: BorderRadius.circular(16),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
@@ -126,6 +131,9 @@ class RegisterRoleView extends GetView<RegisterRoleController> {
                     ),
                     SizedBox(height: 16),
                     Material(
+                      color: AllMaterial.isDarkMode.value
+                          ? null
+                          : AllMaterial.colorWhite,
                       borderRadius: BorderRadius.circular(16),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
@@ -205,10 +213,22 @@ class RegisterRoleView extends GetView<RegisterRoleController> {
                           title:
                               "Menjadi ${AllMaterial.isServant.isTrue ? "Servant" : "Vendee"}",
                           subtitle: "Apakah Anda yakin?",
-                          onConfirm: () {
+                          onConfirm: () async {
+                            Get.back();
+                            AllMaterial.showLoadingDialog();
+
+                            await Future.delayed(
+                              const Duration(milliseconds: 600),
+                            );
                             Get.offAll(() => MainPageView());
-                            controller.daftar(AllMaterial.isServant.isTrue ? "servant" : "vendee");
+                            controller.daftar(AllMaterial.isServant.isTrue
+                                ? "servant"
+                                : "vendee");
                             AllMaterial.box.write("login", true);
+                            Get.back();
+                            ToastService.show(
+                              "Hari baru, Selamat datang!",
+                            );
                           },
                           onCancel: () => Get.back(),
                         );
@@ -229,16 +249,22 @@ class RegisterRoleView extends GetView<RegisterRoleController> {
                               text: TextSpan(
                                 text:
                                     "Dengan mendaftar, Anda menyetujui & menerima\n",
-                                style: TextStyle(),
+                                style: TextStyle(
+                                  color: AllMaterial.isDarkMode.value
+                                      ? AllMaterial.colorWhite
+                                      : AllMaterial.colorBlackPrimary,
+                                ),
                                 children: [
                                   TextSpan(
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
-                                        print(
-                                            "Teks Syarat & Ketentuan Jaspelku ditekan");
+                                        Get.to(() => SyaratKetentuanView());
                                       },
                                     text: "Syarat & Ketentuan Jaspelku",
                                     style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      decorationColor:
+                                          AllMaterial.colorPrimaryShade,
                                       fontWeight: AllMaterial.fontSemiBold,
                                       color: AllMaterial.colorPrimaryShade,
                                     ),

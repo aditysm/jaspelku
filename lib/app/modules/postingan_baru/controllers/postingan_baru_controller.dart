@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 
 class PostinganBaruController extends GetxController {
   RxString selectedOpsi = 'Sekali / Sehari'.obs;
   RxList<String> selectedHari = <String>[].obs;
-
 
   final List<String> allHari = [
     'Senin',
@@ -17,20 +17,23 @@ class PostinganBaruController extends GetxController {
     'Sabtu',
     'Minggu',
   ];
+
   final selectedKategori = ''.obs;
   final selectedJenis = ''.obs;
-  final totalHarga = ''.obs;
   final selectedLokasi = ''.obs;
   final kebutuhanC = TextEditingController();
   final kebutuhanF = FocusNode();
   final totalHargaC = TextEditingController();
   final waktuMulaiC = TextEditingController();
   final waktuSelesaiC = TextEditingController();
+  var totalHargaError = "".obs;
+  var waktuMulaiError = "".obs;
+  var waktuSelesaiError = "".obs;
+  var hariKerjaError = "".obs;
 
   RxList<XFile> selectedMedia = <XFile>[].obs;
   final ImagePicker _picker = ImagePicker();
 
-  // Fungsi untuk memilih gambar dari galeri
   Future<void> pickImagesFromGallery() async {
     try {
       final List<XFile> pickedImages =
@@ -43,7 +46,6 @@ class PostinganBaruController extends GetxController {
     }
   }
 
-  // Fungsi untuk memilih video dari galeri
   Future<void> pickVideoFromGallery() async {
     try {
       final XFile? pickedVideo =
@@ -56,7 +58,6 @@ class PostinganBaruController extends GetxController {
     }
   }
 
-  // Fungsi untuk memilih gambar atau video dari galeri
   Future<void> pickMediaFromGallery() async {
     try {
       final mediaType = await showDialog<String>(
@@ -86,7 +87,6 @@ class PostinganBaruController extends GetxController {
         },
       );
 
-      // Pilih foto atau video berdasarkan pilihan
       if (mediaType == 'photo') {
         await pickImagesFromGallery();
       } else if (mediaType == 'video') {
@@ -97,7 +97,6 @@ class PostinganBaruController extends GetxController {
     }
   }
 
-  // Fungsi untuk memilih gambar atau video dari kamera
   Future<void> pickMediaFromCamera() async {
     try {
       final mediaType = await showDialog<String>(
@@ -127,7 +126,6 @@ class PostinganBaruController extends GetxController {
         },
       );
 
-      // Pilih foto atau video berdasarkan pilihan
       if (mediaType == 'photo') {
         final XFile? image = await _picker.pickImage(
             source: ImageSource.camera, imageQuality: 70);
@@ -146,7 +144,6 @@ class PostinganBaruController extends GetxController {
     }
   }
 
-  // Fungsi untuk menghapus media
   void removeMedia(int index) {
     selectedMedia.removeAt(index);
   }
@@ -156,8 +153,6 @@ class PostinganBaruController extends GetxController {
     return ['mp4', 'mov', 'avi', 'mkv'].contains(extension);
   }
 
-
-
   List<String> getJenisJasaByKategori(String kategori) {
     return AllMaterial.jenisJasaMap[kategori] ?? [];
   }
@@ -166,5 +161,76 @@ class PostinganBaruController extends GetxController {
     selectedKategori.value = '';
     selectedJenis.value = '';
     selectedLokasi.value = '';
+  }
+
+  @override
+  void onInit() {
+    totalHargaC.addListener(() {
+      if (totalHargaC.text.isNotEmpty) totalHargaError.value = '';
+    });
+    waktuMulaiC.addListener(() {
+      if (waktuMulaiC.text.isNotEmpty) waktuMulaiError.value = '';
+    });
+    waktuSelesaiC.addListener(() {
+      if (waktuSelesaiC.text.isNotEmpty) waktuSelesaiError.value = '';
+    });
+    super.onInit();
+  }
+
+  Future<void> validateForm() async {
+    bool isValid = true;
+
+    if (totalHargaC.text.trim().isEmpty) {
+      totalHargaError.value = 'Harga wajib diisi';
+      isValid = false;
+    }
+
+    if (waktuMulaiC.text.trim().isEmpty) {
+      waktuMulaiError.value = 'Waktu mulai wajib diisi';
+      isValid = false;
+    }
+
+    if (waktuSelesaiC.text.trim().isEmpty) {
+      waktuSelesaiError.value = 'Waktu selesai wajib diisi';
+      isValid = false;
+    }
+
+    if (selectedOpsi == "Kustom") {
+      if (selectedHari.isNotEmpty) {
+      } else {
+        hariKerjaError.value = "Hari Kerja wajib dipilih";
+        isValid = false;
+      }
+    } else {}
+
+    if (!isValid) return;
+
+    if (totalHargaError.isNotEmpty ||
+        waktuMulaiError.isNotEmpty ||
+        waktuSelesaiError.isNotEmpty) return;
+
+    AllMaterial.cusDialogValidasi(
+      title: "Ajukan Tawaran",
+      subtitle: "Apakah Anda yakin?",
+      onConfirm: () async {
+        Get.back();
+        AllMaterial.showLoadingDialog();
+        await Future.delayed(const Duration(milliseconds: 400));
+        Get.back();
+        ToastService.show(
+          "Mengajukan tawaran",
+        );
+      },
+      onCancel: () => Get.back(),
+    );
+  }
+
+  @override
+  void onClose() {
+    kebutuhanC.dispose();
+    totalHargaC.dispose();
+    waktuMulaiC.dispose();
+    waktuSelesaiC.dispose();
+    super.onClose();
   }
 }

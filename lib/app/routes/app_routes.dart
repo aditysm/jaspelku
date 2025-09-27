@@ -21,6 +21,13 @@ abstract class Routes {
   static const NOTIFIKASI = _Paths.NOTIFIKASI;
   static const PEMBAYARAN_PESANAN = _Paths.PEMBAYARAN_PESANAN;
   static const PENGENALAN = _Paths.PENGENALAN;
+  static const SYARAT_KETENTUAN = _Paths.SYARAT_KETENTUAN;
+  static const KEBIJAKAN_PRIVASI = _Paths.KEBIJAKAN_PRIVASI;
+  static const PENGATURAN_PEMBAYARAN = _Paths.PENGATURAN_PEMBAYARAN;
+  static const TENTANG_APLIKASI = _Paths.TENTANG_APLIKASI;
+  static const EVENT_PROMO = _Paths.EVENT_PROMO;
+  static const VERIFIKASI_PENGGUNA = _Paths.VERIFIKASI_PENGGUNA;
+  static const VERIFIKASI_AKUN = _Paths.VERIFIKASI_AKUN;
 }
 
 abstract class _Paths {
@@ -43,4 +50,11 @@ abstract class _Paths {
   static const NOTIFIKASI = '/notifikasi';
   static const PEMBAYARAN_PESANAN = '/pembayaran-pesanan';
   static const PENGENALAN = '/pengenalan';
+  static const SYARAT_KETENTUAN = '/syarat-ketentuan';
+  static const KEBIJAKAN_PRIVASI = '/kebijakan-privasi';
+  static const PENGATURAN_PEMBAYARAN = '/pengaturan-pembayaran';
+  static const TENTANG_APLIKASI = '/tentang-aplikasi';
+  static const EVENT_PROMO = '/event-promo';
+  static const VERIFIKASI_PENGGUNA = '/verifikasi-pengguna';
+  static const VERIFIKASI_AKUN = '/verifikasi-akun';
 }

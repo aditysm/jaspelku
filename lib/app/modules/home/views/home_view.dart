@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/modules/histori_pesanan/views/histori_pesanan_view.dart';
 import 'package:jaspelku/app/modules/pencarian/views/pencarian_view.dart';
+import 'package:jaspelku/app/modules/pengaturan_pembayaran/views/pengaturan_pembayaran_view.dart';
 import 'package:jaspelku/app/modules/profil/views/profil_view.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 
 import '../controllers/home_controller.dart';
 
@@ -21,7 +23,6 @@ class HomeView extends GetView<HomeController> {
       "assets/logo/spesialis.jpg",
       "assets/logo/spesialis.jpg",
     ];
-    print("role: ${isServant ? "Servant" : "Vendee"}");
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -32,87 +33,91 @@ class HomeView extends GetView<HomeController> {
           child: ListView(
             controller: homeScrollController,
             children: [
-              Container(
-                clipBehavior: Clip.none,
-                padding: EdgeInsets.only(
-                  left: 32,
-                  right: 32,
-                  top: 17,
-                  bottom: 27,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  gradient: LinearGradient(
-                    colors: [
-                      AllMaterial.colorPrimary,
-                      AllMaterial.colorPrimaryShade,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              GestureDetector(
+                onTap: () => Get.to(() => PengaturanPembayaranView()),
+                child: Container(
+                  clipBehavior: Clip.none,
+                  padding: EdgeInsets.only(
+                    left: 32,
+                    right: 32,
+                    top: 17,
+                    bottom: 27,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AllMaterial.colorPrimary.withOpacity(0.3),
-                      spreadRadius: 1,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    gradient: LinearGradient(
+                      colors: [
+                        AllMaterial.colorPrimary,
+                        AllMaterial.colorPrimaryShade,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Saldo Jaspel Coin",
-                          style: TextStyle(
-                            color: AllMaterial.colorWhite,
-                          ),
-                        ),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: AllMaterial.colorWhite,
-                          ),
-                          onPressed: () {
-                            final paymentUrl =
-                                "https://app.sandbox.midtrans.com/snap/v2/vtweb/12345678-aaaa-bbbb-cccc-123456789abc";
-                            controller.showMidtransWebView(paymentUrl);
-                          },
-                          child: Text(
-                            "+ Topup",
+                    boxShadow: [
+                      BoxShadow(
+                        color: AllMaterial.colorPrimary.withOpacity(0.3),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Saldo Jaspel Coin",
                             style: TextStyle(
-                              color: AllMaterial.colorPrimary,
-                              fontWeight: AllMaterial.fontMedium,
+                              color: AllMaterial.colorWhite,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "IDR",
-                          style: TextStyle(
-                            color: AllMaterial.colorWhite,
-                            fontWeight: AllMaterial.fontBold,
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: AllMaterial.colorWhite,
+                            ),
+                            onPressed: () {
+                              final paymentUrl =
+                                  "https://app.sandbox.midtrans.com/snap/v2/vtweb/12345678-aaaa-bbbb-cccc-123456789abc";
+                              controller.showMidtransWebView(paymentUrl);
+                            },
+                            child: Text(
+                              "+ Topup",
+                              style: TextStyle(
+                                color: AllMaterial.colorPrimary,
+                                fontWeight: AllMaterial.fontMedium,
+                              ),
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 7),
-                        Text(
-                          AllMaterial.formatHarga("150000"),
-                          style: TextStyle(
-                            color: AllMaterial.colorWhite,
-                            fontWeight: AllMaterial.fontBold,
-                            fontSize: 21,
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "IDR",
+                            style: TextStyle(
+                              color: AllMaterial.colorWhite,
+                              fontWeight: AllMaterial.fontBold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          SizedBox(width: 7),
+                          Text(
+                            AllMaterial.formatHarga("150000"),
+                            style: TextStyle(
+                              color: AllMaterial.colorWhite,
+                              fontWeight: AllMaterial.fontBold,
+                              fontSize: 21,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              SizedBox(height: 10),
               Obx(
                 () => HomeController.isPesananAktif.isTrue
                     ? Column(
@@ -152,13 +157,10 @@ class HomeView extends GetView<HomeController> {
                                             false;
                                         Get.back();
                                         Get.back();
-                                        AllMaterial.messageScaffold(
-                                          title: isServant
+                                        ToastService.show(
+                                          isServant
                                               ? "Ajuan pembatalan berhasil!"
                                               : "Pesanan berhasil dibatalkan!",
-                                          adaKendala: true,
-                                          kendalaTitle: "Laporkan Kendala",
-                                          kendalaTap: () {},
                                         );
                                       },
                                       onCancel: () => Get.back(),
@@ -187,13 +189,10 @@ class HomeView extends GetView<HomeController> {
                                             false;
                                         Get.back();
                                         Get.back();
-                                        AllMaterial.messageScaffold(
-                                          title: isServant
+                                        ToastService.show(
+                                          isServant
                                               ? "Ajuan pembatalan berhasil!"
                                               : "Pesanan berhasil dibatalkan!",
-                                          adaKendala: true,
-                                          kendalaTitle: "Laporkan Kendala",
-                                          kendalaTap: () {},
                                         );
                                       },
                                       onCancel: () => Get.back(),
@@ -244,14 +243,10 @@ class HomeView extends GetView<HomeController> {
                                                         .value = false;
                                                     Get.back();
                                                     Get.back();
-                                                    AllMaterial.messageScaffold(
-                                                      title: isServant
+                                                    ToastService.show(
+                                                      isServant
                                                           ? "Ajuan pembatalan berhasil!"
                                                           : "Pesanan berhasil dibatalkan!",
-                                                      adaKendala: true,
-                                                      kendalaTitle:
-                                                          "Laporkan Kendala",
-                                                      kendalaTap: () {},
                                                     );
                                                   },
                                                   onCancel: () => Get.back(),
@@ -458,8 +453,8 @@ class HomeView extends GetView<HomeController> {
                         InkWell(
                           onTap: () {
                             // Get.to(() => PencarianView());
-                            AllMaterial.messageScaffold(
-                                title: "Mengarahkan ke list riwayat pelayanan");
+                            ToastService.show(
+                                "Mengarahkan ke list riwayat pelayanan");
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5),
@@ -605,9 +600,8 @@ class HomeView extends GetView<HomeController> {
                                           "assets/logo/iot.jpg"
                                         ],
                                   onTawarTap: () {
-                                    AllMaterial.messageScaffold(
-                                        title:
-                                            "Mengarahkan ke chat room untuk menawar");
+                                    ToastService.show(
+                                        "Mengarahkan ke chat room untuk menawar");
                                   },
                                   context: context,
                                 ),

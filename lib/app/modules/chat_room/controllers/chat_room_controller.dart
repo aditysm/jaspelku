@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 
 class ChatMessage {
   final String senderId;
@@ -64,7 +64,7 @@ class ChatRoomController extends GetxController {
   }
 
   Future<void> _simulateFetchForRoom(String roomId) async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 400));
     print(roomId);
     final newMessages = [
       ChatMessage(
@@ -92,7 +92,7 @@ class ChatRoomController extends GetxController {
     final text = textController.text.trim();
     if (text.isEmpty) return;
 
-    final phoneRegex = RegExp(r'(?:\+62|62|08)[0-9]{8,}');
+    final phoneRegex = RegExp(r'^(?:\+?62|08)\d{8,12}$');
     if (phoneRegex.hasMatch(text)) {
       showErrorMessageAsChat("Tidak boleh mengirim nomor telepon!");
       return;

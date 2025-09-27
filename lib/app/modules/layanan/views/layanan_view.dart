@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:jaspelku/all_material.dart';
+import 'package:jaspelku/app/utils/all_material.dart';
 import 'package:jaspelku/app/controller/general_controller.dart';
+import 'package:jaspelku/app/utils/toast_dialog.dart';
 import 'package:jaspelku/app/widget/random_topic_container.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
@@ -268,8 +269,8 @@ class LayananView extends GetView<LayananController> {
                 borderRadius: BorderRadius.circular(8),
                 child: InkWell(
                   onTap: () {
-                    AllMaterial.messageScaffold(
-                      title: isPostinganSaya
+                    ToastService.show(
+                      isPostinganSaya
                           ? "Membuka tawaran dan user dapat mengedit tawaran"
                           : "Mengarahkan ke chat dan membuat tawaran",
                     );
@@ -335,7 +336,6 @@ class LayananView extends GetView<LayananController> {
             ],
           ),
           SizedBox(height: 15),
-          Divider(),
         ],
       ),
     );
@@ -414,7 +414,6 @@ class LayananView extends GetView<LayananController> {
       context: context,
       isScrollControlled: true,
       enableDrag: true,
-      // backgroundColor: Colors.transparent,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
